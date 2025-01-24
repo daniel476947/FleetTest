@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet Management Form</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+
+<style>
+  .navbar {
+    background-color: black;
+    padding-top: 15px;  /* Increase top padding */
+    padding-bottom: 15px;  /* Increase bottom padding */
+    position: fixed;  /* Fix the navbar to the top */
+    top: 0;  /* Set it to the top of the page */
+    left: 0;  /* Align to the left edge */
+    width: 100%;  /* Ensure it spans the full width of the page */
+    z-index: 1000;  /* Make sure the navbar stays on top of other content */
+  }
+
+  .navbar-nav .nav-link {
+    color: white !important;
+  }
+
+  .navbar-nav .nav-link:hover {
+    color: #777684 !important;
+  }
+
+  .navbar-container {
+    padding-left: 30px; /* Adjust the left padding */
+    padding-right: 30px; /* Adjust the right padding */
+  }
+
+  /* Add padding to the body to prevent content from being hidden behind the navbar */
+  body {
+    padding-top: 75px;  /* Adjust this based on your navbar height */
+  }
+</style>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid navbar-container"> <!-- Added custom container class with padding -->
+    <!-- Logo on the left -->
+    <a class="navbar-brand" href="#">
+      <img src="/static/logo.jpeg" alt="Company Logo" style="height: 40px;">
+    </a>
+
+    <!-- Toggle button for mobile view -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navbar links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/view_fleet">Fleet</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/">Form</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Fleet Management Form</h1>
+        
+        <form id="fleetForm" class="shadow p-4 rounded bg-light">
+            <div class="mb-3">
+                <label for="registration_no" class="form-label">Registration No:</label>
+                <input type="text" class="form-control" id="registration_no" name="Registration No" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="make" class="form-label">Make:</label>
+                <input type="text" class="form-control" id="make" name="Make" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="model" class="form-label">Model:</label>
+                <input type="text" class="form-control" id="model" name="Model" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="vehicle_type" class="form-label">Vehicle Type:</label>
+                <select class="form-select" id="vehicle_type" name="Vehicle Type" required>
+                    <option value="" selected>Select</option>
+                    <option value="Sedan">Sedan</option>
+                    <option value="Hatchback">Hatchback</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Mini Van">Mini Van</option>
+                    <option value="Van">Van</option>
+                    <option value="Truck">Truck</option>
+                    <option value="Wagon">Wagon</option>
+                    <option value="Coupe">Coupe</option>
+                    <option value="Mini Bus">Mini Bus</option>
+                    <option value="Medium Bus">Medium Bus</option>
+                    <option value="Large Bus">Large Bus</option>
+                    <option value="Pick up">Pick up</option>
+                    <option value="Convertible">Convertible</option>
+                    <option value="Tractor">Tractor</option>
+                    <option value="Forklift">Forklift</option>
+                    <option value="Machinery">Machinery</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="year" class="form-label">Year:</label>
+                <select class="form-select" id="year" name="Year" required>
+                    <option value="" selected>Select</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="main_colour" class="form-label">Main Colour:</label>
+                <select class="form-select" id="main_colour" name="Main Colour" required>
+                    <option value="" selected>Select</option>
+                    <option value="Beige">Beige</option>
+                    <option value="Black">Black</option>
+                    <option value="Blue">Blue</option>
+                    <option value="Brown">Brown</option>
+                    <option value="Burgundy">Burgundy</option>
+                    <option value="Gold">Gold</option>
+                    <option value="Gray">Gray</option>
+                    <option value="Green">Green</option>
+                    <option value="Orange">Orange</option>
+                    <option value="Pink">Pink</option>
+                    <option value="Purple">Purple</option>
+                    <option value="Red">Red</option>
+                    <option value="Silver">Silver</option>
+                    <option value="Teal">Teal</option>
+                    <option value="Turquoise">Turquoise</option>
+                    <option value="White">White</option>
+                    <option value="Wine Red">Wine Red</option>
+                    <option value="Yellow">Yellow</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="secondary_colour" class="form-label">Secondary Colour:</label>
+                <select class="form-select" id="secondary_colour" name="Secondary Colour" required>
+                    <option value="None" selected>None</option>
+                    <option value="Beige">Beige</option>
+                    <option value="Black">Black</option>
+                    <option value="Blue">Blue</option>
+                    <option value="Brown">Brown</option>
+                    <option value="Burgundy">Burgundy</option>
+                    <option value="Gold">Gold</option>
+                    <option value="Gray">Gray</option>
+                    <option value="Green">Green</option>
+                    <option value="Orange">Orange</option>
+                    <option value="Pink">Pink</option>
+                    <option value="Purple">Purple</option>
+                    <option value="Red">Red</option>
+                    <option value="Silver">Silver</option>
+                    <option value="Teal">Teal</option>
+                    <option value="Turquoise">Turquoise</option>
+                    <option value="White">White</option>
+                    <option value="Wine Red">Wine Red</option>
+                    <option value="Yellow">Yellow</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="fuel" class="form-label">Fuel:</label>
+                <select class="form-select" id="fuel" name="Fuel" required>
+                    <option value="" selected>Select</option>
+                    <option value="Gas">Gas</option>
+                    <option value="Diesel">Diesel</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="status" class="form-label">Status:</label>
+                <select class="form-select" id="status" name="Status" required>
+                    <option value="" selected>Select</option>
+                    <option value="Active">Active</option>
+                    <option value="Parked">Parked</option>
+                    <option value="Out of Order">Out of Order</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="capacity" class="form-label">Capacity:</label>
+                <input type="text" class="form-control" id="capacity" name="Capacity" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="chassis_no" class="form-label">Chassis No:</label>
+                <input type="text" class="form-control" id="chassis_no" name="Chassis No" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="model_no" class="form-label">Model No:</label>
+                <input type="text" class="form-control" id="model_no" name="Model No" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="location" class="form-label">Location:</label>
+                <select class="form-select" id="location" name="Location" required>
+                    <option value="" selected>Select</option>
+                    <option value="Prashad Nagar">Prashad Nagar</option>
+                    <option value="Eccles">Eccles</option>
+                </select>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <button type="button" class="btn btn-primary" onclick="submitForm()">Submit</button>
+                <button type="button" class="btn btn-secondary" onclick="clearForm()">Clear</button>
+            </div>
+        </form>
+        
+
+
+    </div>
+    
+    <style>
+  /* Footer Styles */
+  .footer {
+    background-color: black;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    margin-top: 100px;  /* Add margin on top */
+  }
+
+  .footer a {
+    color: #f8f9fa;
+    text-decoration: none;
+  }
+
+  .footer a:hover {
+    text-decoration: underline;
+  }
+
+  .footer p {
+    margin: 0;
+  }
+</style>
+<!-- Footer HTML -->
+<footer class="footer">
+  <p>&copy; 2025 Knight Rider Transportation. All rights reserved.</p>
+  <p>
+    <a href="/privacy-policy">Privacy Policy</a> | 
+    <a href="/terms-of-service">Terms of Service</a>
+  </p>
+</footer>
+
+    <!-- Bootstrap 5 JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+    <script>
+    
+  
+        // Dynamically populate the year dropdown from the current year to 1970
+        const yearSelect = document.getElementById('year');
+        const currentYear = new Date().getFullYear();
+
+        for (let year = currentYear; year >= 1970; year--) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            yearSelect.appendChild(option);
+        }
+
+        function submitForm() {
+            const form = document.getElementById('fleetForm');
+            const formData = new FormData(form);
+
+            // Handle 'Secondary Colour': Set to empty string if it's "None" or not selected
+            const secondaryColour = formData.get('Secondary Colour');
+            if (secondaryColour === "None" || secondaryColour === "") {
+                formData.set('Secondary Colour', "");
+            }
+
+            fetch('http://localhost:8000/upload', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                    } else {
+                        alert('Error uploading data. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error uploading data. Please try again.');
+                });
+        }
+
+        function clearForm() {
+            const form = document.getElementById('fleetForm');
+            form.reset();
+        }
+        
+        
+    </script>
+</body>
+</html>

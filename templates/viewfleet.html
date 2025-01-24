@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet Management - View Fleet</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+  .navbar {
+    background-color: black;
+    padding-top: 15px;  /* Increase top padding */
+    padding-bottom: 15px;  /* Increase bottom padding */
+    position: fixed;  /* Fix the navbar to the top */
+    top: 0;  /* Set it to the top of the page */
+    left: 0;  /* Align to the left edge */
+    width: 100%;  /* Ensure it spans the full width of the page */
+    z-index: 1000;  /* Make sure the navbar stays on top of other content */
+  }
+
+  .navbar-nav .nav-link {
+    color: white !important;
+  }
+
+  .navbar-nav .nav-link:hover {
+    color: #777684 !important;
+  }
+
+  .navbar-container {
+    padding-left: 30px; /* Adjust the left padding */
+    padding-right: 30px; /* Adjust the right padding */
+  }
+
+  /* Add padding to the body to prevent content from being hidden behind the navbar */
+  body {
+    padding-top: 75px;  /* Adjust this based on your navbar height */
+  }
+</style>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid navbar-container"> <!-- Added custom container class with padding -->
+    <!-- Logo on the left -->
+    <a class="navbar-brand" href="#">
+      <img src="/static/logo.jpeg" alt="Company Logo" style="height: 40px;">
+    </a>
+
+    <!-- Toggle button for mobile view -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navbar links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/view_fleet">Fleet</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/">Form</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <style>
+        /* Add styling to make the table look like an Excel sheet */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .table-container {
+            margin-top: 50px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Fleet Management - View Fleet</h1>
+        
+        <!-- Search Form -->
+        <div class="mb-4 d-flex justify-content-center">
+            <form method="POST" class="w-50">
+                <!-- Search Bar -->
+                <input type="text" name="search" class="form-control mb-3" placeholder="Search by Registration No, Make, Model or Chassis No">
+                
+                <!-- Filter Dropdowns -->
+                
+                <div class="d-flex justify-content-between flex-wrap">
+                    <!-- Registered/Unregistered Dropdown -->
+<select name="registration_status" class="form-select w-20 mb-3">
+    <option value="">Registration Status</option>
+    <option value="Registered">Registered</option>
+    <option value="Unregistered">Unregistered</option>
+</select>
+                    <select name="vehicle_type" class="form-select w-20 mx-2">
+                        <option value="">Vehicle Type</option>
+                        <option value="Sedan">Sedan</option>
+                        <option value="Hatchback">Hatchback</option>
+                        <option value="SUV">SUV</option>
+                        <option value="Mini Van">Mini Van</option>
+                        <option value="Van">Van</option>
+                        <option value="Truck">Truck</option>
+                        <option value="Wagon">Wagon</option>
+                        <option value="Coupe">Coupe</option>
+                        <option value="Mini Bus">Mini Bus</option>
+                        <option value="Medium Bus">Medium Bus</option>
+                        <option value="Large Bus">Large Bus</option>
+                        <option value="Pick up">Pick up</option>
+                        <option value="Convertible">Convertible</option>
+                        <option value="Tractor">Tractor</option>
+                        <option value="Forklift">Forklift</option>
+                        <option value="Machinery">Machinery</option>
+                    </select>
+
+                    <select name="main_colour" class="form-select w-20 mx-2">
+                        <option value="">Main Colour</option>
+                        <option value="Beige">Beige</option>
+                        <option value="Black">Black</option>
+                        <option value="Blue">Blue</option>
+                        <option value="Brown">Brown</option>
+                        <option value="Burgundy">Burgundy</option>
+                        <option value="Gold">Gold</option>
+                        <option value="Gray">Gray</option>
+                        <option value="Green">Green</option>
+                        <option value="Orange">Orange</option>
+                        <option value="Pink">Pink</option>
+                        <option value="Purple">Purple</option>
+                        <option value="Red">Red</option>
+                        <option value="Silver">Silver</option>
+                        <option value="Teal">Teal</option>
+                        <option value="Turquoise">Turquoise</option>
+                        <option value="White">White</option>
+                        <option value="Wine Red">Wine Red</option>
+                        <option value="Yellow">Yellow</option>
+                    </select>
+
+                    <select name="secondary_colour" class="form-select w-20 mx-2">
+                        <option value="">Secondary Colour</option>
+                        <option value="Beige">Beige</option>
+                        <option value="Black">Black</option>
+                        <option value="Blue">Blue</option>
+                        <option value="Brown">Brown</option>
+                        <option value="Burgundy">Burgundy</option>
+                        <option value="Gold">Gold</option>
+                        <option value="Gray">Gray</option>
+                        <option value="Green">Green</option>
+                        <option value="Orange">Orange</option>
+                        <option value="Pink">Pink</option>
+                        <option value="Purple">Purple</option>
+                        <option value="Red">Red</option>
+                        <option value="Silver">Silver</option>
+                        <option value="Teal">Teal</option>
+                        <option value="Turquoise">Turquoise</option>
+                        <option value="White">White</option>
+                        <option value="Wine Red">Wine Red</option>
+                        <option value="Yellow">Yellow</option>
+                    </select>
+
+                    <!-- Other Dropdowns -->
+                    <select name="fuel" class="form-select w-20 mx-2">
+                        <option value="">Fuel</option>
+                        <option value="Gas">Gas</option>
+                        <option value="Diesel">Diesel</option>
+                    </select>
+
+                    <select name="status" class="form-select w-20 mx-2">
+                        <option value="">Status</option>
+                        <option value="Active">Active</option>
+                        <option value="Parked">Parked</option>
+                        <option value="Out of Order">Out of Order</option>
+                    </select>
+
+                    <select name="location" class="form-select w-20 mx-2">
+                        <option value="">Location</option>
+                        <option value="Prashad Nagar">Prashad Nagar</option>
+                        <option value="Eccles">Eccles</option>
+                    </select>
+                </div>
+
+                <!-- Apply Button Below Filters -->
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Vehicle Table -->
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Registration No</th>
+                        <th>Make</th>
+                        <th>Model</th>
+                        <th>Vehicle Type</th>
+                        <th>Year</th>
+                        <th>Main Colour</th>
+                        <th>Secondary Colour</th>
+                        <th>Fuel</th>
+                        <th>Capacity</th>
+                        <th>Chassis No</th>
+                        <th>Model No</th>
+                        <th>Status</th>
+                        <th>Location</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vehicle in vehicles %}
+                        <tr>
+                            <td>{{ vehicle['Registration No'] }}</td>
+                            <td>{{ vehicle['Make'] }}</td>
+                            <td>{{ vehicle['Model'] }}</td>
+                            <td>{{ vehicle['Vehicle Type'] }}</td>
+                            <td>{{ vehicle['Year'] }}</td>
+                            <td>{{ vehicle['Main Colour'] }}</td>
+                            <td>{{ vehicle['Secondary Colour'] }}</td>
+                            <td>{{ vehicle['Fuel'] }}</td>
+                            <td>{{ vehicle['Capacity'] }}</td>
+                            <td>{{ vehicle['Chassis No'] }}</td>
+                            <td>{{ vehicle['Model No'] }}</td>
+                            <td>{{ vehicle['Status'] }}</td>
+                            <td>{{ vehicle['Location'] }}</td>
+                            <td>
+                <div class="btn-group" role="group" aria-label="Actions">
+                    <!-- Edit Button -->
+                    <a href="/edit/{{ vehicle['_id'] }}" class="btn btn-sm btn-primary w-100 me-2">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </a>
+                    <!-- Delete Button -->
+                    <form action="/delete/{{ vehicle['_id'] }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger"
+                            onclick="return confirm('Are you sure you want to delete this vehicle?');">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </td>
+                        </tr>
+                        
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-center mt-4">
+    <a href="{{ url_for('export_fleet', 
+            search=request.form.get('search', ''), 
+            vehicle_type=request.form.get('vehicle_type', ''),
+            main_colour=request.form.get('main_colour', ''), 
+            secondary_colour=request.form.get('secondary_colour', ''),
+            fuel=request.form.get('fuel', ''), 
+            status=request.form.get('status', ''), 
+            location=request.form.get('location', ''),
+            registration_status=request.form.get('registration_status', '')  
+        ) }}"
+        class="btn btn-success">Export Data to Excel</a>
+</div>
+    </div>
+    
+   <style>
+  /* Footer Styles */
+  .footer {
+    background-color: black;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    margin-top: 100px;  /* Add margin on top */
+  }
+
+  .footer a {
+    color: #f8f9fa;
+    text-decoration: none;
+  }
+
+  .footer a:hover {
+    text-decoration: underline;
+  }
+
+  .footer p {
+    margin: 0;
+  }
+</style>
+<!-- Footer HTML -->
+<footer class="footer">
+  <p>&copy; 2025 Knight Rider Transportation. All rights reserved.</p>
+  <p>
+    <a href="/privacy-policy">Privacy Policy</a> | 
+    <a href="/terms-of-service">Terms of Service</a>
+  </p>
+</footer> 
+
+</body>
+</html>
