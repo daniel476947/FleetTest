@@ -6,6 +6,7 @@ from openpyxl import load_workbook
 from openpyxl.styles import Alignment
 from bson.objectid import ObjectId
 import os
+import re
 
 
 app = Flask(__name__)
@@ -21,48 +22,64 @@ client = MongoClient(MONGO_URI)
 db = client['Fleettest']
 collection = db['Fleet']
 
+REG_NO_PATTERN = r'^[A-Z]{3} [0-9]{1,4}$'  # 3 uppercase letters, space, 1-4 digits
+
 @app.route('/')
 def index():
     return render_template('form.html')  # Renders the HTML form
 
+
 @app.route('/upload', methods=['POST'])
 def upload():
     try:
-        # Retrieve form data as strings
-        year_str = request.form.get('Year', '').strip()
-        capacity_str = request.form.get('Capacity', '').strip()
+        # 1. Grab the raw Registration No from form, strip whitespace
+        reg_no_raw = request.form.get('Registration No', '').strip()
 
-        # Try converting year and capacity to integers
-        try:
-            year_val = int(year_str)
-            capacity_val = int(capacity_str)
-        except ValueError:
-            return jsonify({"success": False, "message": "Year and Capacity must be valid integers."}), 400
+        # 2. Convert to uppercase
+        reg_no = reg_no_raw.upper()
 
+        # 3. Validate with regex
+        if reg_no and not re.match(REG_NO_PATTERN, reg_no):
+            return jsonify({"success": False, "message": "Invalid Registration No format."}), 400
+
+        # Convert Year, Capacity to int as previously shown, etc.
+        year_val = int(request.form.get('Year', '').strip())        
+        capacity_val = int(request.form.get('Capacity', '').strip())
+
+        # If 'Secondary Colour' is "None", store empty string
+        secondary_colour = request.form.get('Secondary Colour', '').strip()
+        if secondary_colour.lower() == 'none':
+            secondary_colour = ""
+
+        # Build vehicle_data dictionary
         vehicle_data = {
-            "Registration No": request.form.get('Registration No', '').strip(),
+            "Registration No": reg_no,
             "Make": request.form.get('Make', '').strip(),
             "Model": request.form.get('Model', '').strip(),
             "Vehicle Type": request.form.get('Vehicle Type', '').strip(),
-            "Year": year_val,                      # store as integer
+            "Year": year_val,
             "Main Colour": request.form.get('Main Colour', '').strip(),
-            "Secondary Colour": request.form.get('Secondary Colour', '').strip(),
+            "Secondary Colour": secondary_colour,
             "Fuel": request.form.get('Fuel', '').strip(),
-            "Capacity": capacity_val,              # store as integer
+            "Capacity": capacity_val,
             "Chassis No": request.form.get('Chassis No', '').strip(),
             "Model No": request.form.get('Model No', '').strip(),
             "Status": request.form.get('Status', '').strip(),
             "Location": request.form.get('Location', '').strip()
         }
 
-        # Insert data into MongoDB
+        # 4. Insert into MongoDB
         result = collection.insert_one(vehicle_data)
         print(f"Data successfully inserted with ID: {result.inserted_id}")
         return jsonify({"success": True, "message": "Data uploaded successfully!"}), 200
 
+    except ValueError:
+        # If int() conversions fail
+        return jsonify({"success": False, "message": "Year and Capacity must be valid integers."}), 400
     except Exception as e:
         print(f"Error inserting data: {e}")
         return jsonify({"success": False, "message": "Error uploading data."}), 500
+
 
 
 @app.route('/view_fleet', methods=['GET', 'POST'])

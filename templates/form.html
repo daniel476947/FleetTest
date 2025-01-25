@@ -72,9 +72,18 @@
         
         <form id="fleetForm" class="shadow p-4 rounded bg-light">
             <div class="mb-3">
-                <label for="registration_no" class="form-label">Registration No:</label>
-                <input type="text" class="form-control" id="registration_no" name="Registration No" required>
+              <label for="registration_no" class="form-label">Registration No:</label>
+              <input 
+                type="text"
+                class="form-control"
+                id="registration_no"
+                name="Registration No"
+                pattern="^[A-Z]{3} [0-9]{1,4}$"
+                title="Must be 3 letters (automatically capitalized), a space, then 1 to 4 digits (e.g. PGG 1567)"
+                required
+              >
             </div>
+          
 
             <div class="mb-3">
                 <label for="make" class="form-label">Make:</label>
@@ -272,6 +281,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 
     <script>
+
+        const regNoInput = document.getElementById('registration_no');
+          regNoInput.addEventListener('input', function () {
+            // Convert the entire field's value to uppercase as the user types
+            this.value = this.value.toUpperCase();
+          });
     
   
         // Dynamically populate the year dropdown from the current year to 1970
