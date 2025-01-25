@@ -90,28 +90,29 @@
       margin: 0;
     }
 
-    /* Make the leftmost column sticky */
+    /* 1) Sticky column for both header (th) and body (td) */
     .sticky-column {
         position: sticky;
         left: 0;
-        background-color: #fff;  /* Solid white background so data doesn't show through */
-        z-index: 10;             /* Ensures it appears above other columns */
-        white-space: nowrap;
+        background-color: #fff;   /* Solid background so content doesn't show through */
+        z-index: 10;             /* Must be higher than normal cells */
+        white-space: nowrap;     /* Prevents text from wrapping if column is narrow */
     }
 
-    /* Make header row sticky at the top */
+    /* 2) If your table header row is also sticky, give that cell a higher z-index so it stays on top */
+    thead th.sticky-column {
+        background-color: #f4f4f4; /* or match your header color */
+        z-index: 11;              /* Slightly higher than the body cells */
+    }
+
+    /* 3) If you want the entire header row sticky, you can do: */
     thead th {
         position: sticky;
         top: 0;
         background-color: #f4f4f4;
-        z-index: 5; /* Stays above scrolling body rows */
+        z-index: 5; /* Ensure it stays above the table rows */
     }
 
-    /* If you have a sticky header cell in the "No." column, bump its z-index above the other thead cells */
-    thead th.sticky-column {
-        z-index: 11;  /* Higher than .sticky-column's 10, so the header cell is above the body cells */
-        background-color: #f4f4f4;
-    }
 
 
   </style>

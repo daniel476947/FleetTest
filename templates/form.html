@@ -185,9 +185,22 @@
                 </select>
             </div>
 
-            <div class="mb-3">
+              <div class="mb-3">
                 <label for="capacity" class="form-label">Capacity:</label>
-                <input type="text" class="form-control" id="capacity" name="Capacity" required>
+                <!-- 
+                  type="number" restricts the field to numeric input in most modern browsers.
+                  onkeydown="return event.keyCode !== 32" prevents spaces (key code 32) 
+                  step="1" ensures only integer-like numbers if typed. 
+                -->
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  id="capacity" 
+                  name="Capacity" 
+                  step="1" 
+                  onkeydown="return event.keyCode !== 32" 
+                  required
+                >
             </div>
 
             <div class="mb-3">
