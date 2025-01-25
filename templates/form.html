@@ -79,10 +79,11 @@
                 id="registration_no"
                 name="Registration No"
                 pattern="^[A-Z]{3} [0-9]{1,4}$"
-                title="Must be 3 letters (automatically capitalized), a space, then 1 to 4 digits (e.g. PGG 1567)"
+                title="Must be 3 uppercase letters, a space, then 1 to 4 digits (e.g., PGG 1567)"
                 required
               >
             </div>
+          
           
 
             <div class="mb-3">
@@ -281,60 +282,104 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 
     <script>
-
-        const regNoInput = document.getElementById('registration_no');
-          regNoInput.addEventListener('input', function () {
-            // Convert the entire field's value to uppercase as the user types
-            this.value = this.value.toUpperCase();
-          });
-    
+      // Dynamically populate the year dropdown from the current year to 1970
+      const yearSelect = document.getElementById('year');
+      const currentYear = new Date().getFullYear();
   
-        // Dynamically populate the year dropdown from the current year to 1970
-        const yearSelect = document.getElementById('year');
-        const currentYear = new Date().getFullYear();
-
-        for (let year = currentYear; year >= 1970; year--) {
-            const option = document.createElement('option');
-            option.value = year;
-            option.textContent = year;
-            yearSelect.appendChild(option);
-        }
-
-        function submitForm() {
-            const form = document.getElementById('fleetForm');
-            const formData = new FormData(form);
-
-            // Handle 'Secondary Colour': Set to empty string if it's "None" or not selected
-            const secondaryColour = formData.get('Secondary Colour');
-            if (secondaryColour === "None" || secondaryColour === "") {
-                formData.set('Secondary Colour', "");
-            }
-
-            fetch('/upload', {
-    method: 'POST',
-    body: formData
-})
-
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                    } else {
-                        alert('Error uploading data. Please try again.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error uploading data. Please try again.');
-                });
-        }
-
-        function clearForm() {
-            const form = document.getElementById('fleetForm');
-            form.reset();
-        }
-        
-        
-    </script>
+      for (let year = currentYear; year >= 1970; year--) {
+          const option = document.createElement('option');
+          option.value = year;
+          option.textContent = year;
+          yearSelect.appendChild(option);
+      }
+  
+      // Auto-capitalize and enforce Registration No format
+      const regNoInput = document.getElementById('registration_no');
+      regNoInput.addEventListener('input', function () {
+          // Convert to uppercase
+          this.value = this.value.toUpperCase();
+  
+          // Enforce the pattern as the user types
+          const cursorPosition = this.selectionStart;
+          const value = this.value;
+  
+          // Allow only letters for the first 3 characters
+          if (cursorPosition <= 3) {
+              this.value = value.replace(/[^A-Z]/g, '');
+          }
+  
+          // Automatically add a space after the first 3 letters
+          if (value.length === 3 && !value.includes(' ')) {
+              this.value = value + ' ';
+          }
+  
+          // Allow only digits after the space, and limit to 4 digits
+          if (value.length > 4) { // 3 letters + 1 space + 4 digits = 8 characters max
+              this.value = value.slice(0, 8);
+          }
+  
+          // Remove any invalid characters after the space
+          const parts = this.value.split(' ');
+          if (parts.length > 1) {
+              parts[1] = parts[1].replace(/[^0-9]/g, '').slice(0,4); // Allow only digits and limit to 4
+              this.value = parts.join(' ');
+          }
+      });
+  
+      // Function to validate Registration No using regex
+      function isValidRegistrationNo(regNo) {
+          const REG_NO_PATTERN = /^[A-Z]{3} [0-9]{1,4}$/;
+          return REG_NO_PATTERN.test(regNo);
+      }
+  
+      function submitForm() {
+          const form = document.getElementById('fleetForm');
+          const formData = new FormData(form);
+  
+          // Handle 'Secondary Colour': Set to empty string if it's "None" or not selected
+          const secondaryColour = formData.get('Secondary Colour');
+          if (secondaryColour === "None" || secondaryColour === "") {
+              formData.set('Secondary Colour', "");
+          }
+  
+          // Get the Registration No and validate it
+          const regNo = formData.get('Registration No').trim();
+          if (!isValidRegistrationNo(regNo)) {
+              alert('Invalid Registration No format. It should be 3 uppercase letters, a space, followed by 1 to 4 digits (e.g., PGG 1567).');
+              return; // Prevent form submission
+          }
+  
+          fetch('/upload', {
+              method: 'POST',
+              body: formData
+          })
+              .then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      alert(data.message);
+                      form.reset(); // Optionally reset the form upon success
+                  } else {
+                      alert('Error uploading data. Please try again.');
+                  }
+              })
+              .catch(error => {
+                  console.error('Error:', error);
+                  alert('Error uploading data. Please try again.');
+              });
+      }
+  
+      function clearForm() {
+          const form = document.getElementById('fleetForm');
+          form.reset();
+      }
+  
+      // Attach the submitForm function to the form's submit event
+      const fleetForm = document.getElementById('fleetForm');
+      fleetForm.addEventListener('submit', function(event) {
+          event.preventDefault(); // Prevent default form submission
+          submitForm();
+      });
+  </script>
+  
 </body>
 </html>
