@@ -209,21 +209,30 @@ def edit_vehicle(id):
             return jsonify({"success": False, "message": "Vehicle not found."}), 404
 
         if request.method == 'POST':
-            # Update the vehicle with new data from the form
+            # Parse as integers
+            year_str = request.form.get('Year', '').strip()
+            capacity_str = request.form.get('Capacity', '').strip()
+
+            try:
+                year_val = int(year_str)
+                capacity_val = int(capacity_str)
+            except ValueError:
+                return jsonify({"success": False, "message": "Year and Capacity must be valid integers."}), 400
+
             updated_data = {
-                "Registration No": request.form.get('Registration No'),
-                "Make": request.form.get('Make'),
-                "Model": request.form.get('Model'),
-                "Vehicle Type": request.form.get('Vehicle Type'),
-                "Year": request.form.get('Year'),
-                "Main Colour": request.form.get('Main Colour'),
-                "Secondary Colour": request.form.get('Secondary Colour'),
-                "Fuel": request.form.get('Fuel'),
-                "Capacity": request.form.get('Capacity'),
-                "Chassis No": request.form.get('Chassis No'),
-                "Model No": request.form.get('Model No'),
-                "Status": request.form.get('Status'),
-                "Location": request.form.get('Location')
+                "Registration No": request.form.get('Registration No', '').strip(),
+                "Make": request.form.get('Make', '').strip(),
+                "Model": request.form.get('Model', '').strip(),
+                "Vehicle Type": request.form.get('Vehicle Type', '').strip(),
+                "Year": year_val,
+                "Main Colour": request.form.get('Main Colour', '').strip(),
+                "Secondary Colour": request.form.get('Secondary Colour', '').strip(),
+                "Fuel": request.form.get('Fuel', '').strip(),
+                "Capacity": capacity_val,
+                "Chassis No": request.form.get('Chassis No', '').strip(),
+                "Model No": request.form.get('Model No', '').strip(),
+                "Status": request.form.get('Status', '').strip(),
+                "Location": request.form.get('Location', '').strip()
             }
             collection.update_one({"_id": ObjectId(id)}, {"$set": updated_data})
             return redirect('/view_fleet')
@@ -232,6 +241,7 @@ def edit_vehicle(id):
     except Exception as e:
         print(f"Error editing vehicle: {e}")
         return jsonify({"success": False, "message": "Error editing vehicle."}), 500
+
 
 @app.route('/delete/<id>', methods=['POST'])
 def delete_vehicle(id):
