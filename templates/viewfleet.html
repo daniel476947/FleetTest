@@ -92,20 +92,27 @@
 
     /* Make the leftmost column sticky */
     .sticky-column {
-      position: sticky;
-      left: 0;
-      background-color: #fff; /* Keep the background white so text is visible */
-      z-index: 10;            /* Ensure this column is above other scrolling cells */
-      white-space: nowrap;    /* Prevent text wrapping if desired */
+        position: sticky;
+        left: 0;
+        background-color: #fff;  /* Solid white background so data doesn't show through */
+        z-index: 10;             /* Ensures it appears above other columns */
+        white-space: nowrap;
     }
 
-    /* Also consider making the header row sticky at the top */
+    /* Make header row sticky at the top */
     thead th {
-      position: sticky;
-      top: 0;
-      background-color: #f4f4f4;
-      z-index: 5;
+        position: sticky;
+        top: 0;
+        background-color: #f4f4f4;
+        z-index: 5; /* Stays above scrolling body rows */
     }
+
+    /* If you have a sticky header cell in the "No." column, bump its z-index above the other thead cells */
+    thead th.sticky-column {
+        z-index: 11;  /* Higher than .sticky-column's 10, so the header cell is above the body cells */
+        background-color: #f4f4f4;
+    }
+
 
   </style>
 </head>
@@ -292,7 +299,6 @@
         <tbody>
           {% for vehicle in vehicles %}
             <tr>
-              !-- Use loop.index to display the row number (1-based) -->
               <td class="sticky-column">{{ loop.index }}</td>
               <td>{{ vehicle['Registration No'] }}</td>
               <td>{{ vehicle['Make'] }}</td>
