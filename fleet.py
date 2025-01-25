@@ -200,7 +200,9 @@ def export_fleet():
     except Exception as e:
         print(f"Error exporting data: {e}")
         return jsonify({"success": False, "message": "Error exporting data."}), 500
-        
+
+
+
 @app.route('/edit/<id>', methods=['GET', 'POST'])
 def edit_vehicle(id):
     try:
@@ -208,39 +210,58 @@ def edit_vehicle(id):
         if not vehicle:
             return jsonify({"success": False, "message": "Vehicle not found."}), 404
 
+        # Render the form for GET requests
+        if request.method == 'GET':
+            return render_template('editvehicle.html', vehicle=vehicle)
+
+        # Handle the POST (form submission)
         if request.method == 'POST':
-            # Parse as integers
+            # Get the raw input as strings
             year_str = request.form.get('Year', '').strip()
             capacity_str = request.form.get('Capacity', '').strip()
 
+            # Convert Year and Capacity to integers, or fail with 400
             try:
                 year_val = int(year_str)
                 capacity_val = int(capacity_str)
             except ValueError:
-                return jsonify({"success": False, "message": "Year and Capacity must be valid integers."}), 400
+                return jsonify({"success": False, 
+                                "message": "Year and Capacity must be valid integers."}), 400
 
+            # If 'Secondary Colour' is "None", store as empty string
+            secondary_colour = request.form.get('Secondary Colour', '').strip()
+            if secondary_colour.lower() == 'none':
+                secondary_colour = ""
+
+            # Build updated data
             updated_data = {
                 "Registration No": request.form.get('Registration No', '').strip(),
                 "Make": request.form.get('Make', '').strip(),
                 "Model": request.form.get('Model', '').strip(),
                 "Vehicle Type": request.form.get('Vehicle Type', '').strip(),
-                "Year": year_val,
+                "Year": year_val,   # store as int
                 "Main Colour": request.form.get('Main Colour', '').strip(),
-                "Secondary Colour": request.form.get('Secondary Colour', '').strip(),
+                "Secondary Colour": secondary_colour,
                 "Fuel": request.form.get('Fuel', '').strip(),
-                "Capacity": capacity_val,
+                "Capacity": capacity_val,  # store as int
                 "Chassis No": request.form.get('Chassis No', '').strip(),
                 "Model No": request.form.get('Model No', '').strip(),
                 "Status": request.form.get('Status', '').strip(),
                 "Location": request.form.get('Location', '').strip()
             }
+
+            # Update the document in MongoDB
             collection.update_one({"_id": ObjectId(id)}, {"$set": updated_data})
             return redirect('/view_fleet')
 
-        return render_template('editvehicle.html', vehicle=vehicle)
     except Exception as e:
         print(f"Error editing vehicle: {e}")
         return jsonify({"success": False, "message": "Error editing vehicle."}), 500
+
+
+if __name__ == '__main__':
+    app.run()
+
 
 
 @app.route('/delete/<id>', methods=['POST'])
