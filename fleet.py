@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, send_file, redirect
+from flask import Flask, request, jsonify, render_template, send_file, redirect, url_for
 from flask_cors import CORS
 from pymongo import MongoClient
 import pandas as pd
@@ -7,13 +7,22 @@ from openpyxl.styles import Alignment
 from bson.objectid import ObjectId
 import os
 import re
-
+import tempfile
+import logging
 
 app = Flask(__name__)
 CORS(app)
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, filename='app.log',
+                    format='%(asctime)s %(levelname)s:%(message)s')
+
 # MongoDB Atlas connection string
 MONGO_URI = os.getenv('MONGO_URI')
+
+if not MONGO_URI:
+    logging.error("MONGO_URI environment variable not set.")
+    raise EnvironmentError("MONGO_URI environment variable not set.")
 
 # Initialize the client
 client = MongoClient(MONGO_URI)
@@ -24,10 +33,53 @@ collection = db['Fleet']
 
 REG_NO_PATTERN = r'^[A-Z]{3} [0-9]{1,4}$'  # 3 uppercase letters, space, 1-4 digits
 
+def build_query(form_data):
+    """
+    Builds a MongoDB query dictionary based on form data.
+    """
+    query = {}
+    search_term = form_data.get('search', '').strip()
+    
+    if search_term:
+        search_words = search_term.split()
+        query["$and"] = []
+        for word in search_words:
+            or_conditions = [
+                {"Registration No": {"$regex": word, "$options": "i"}},
+                {"Make": {"$regex": word, "$options": "i"}},
+                {"Model": {"$regex": word, "$options": "i"}},
+                {"Chassis No": {"$regex": word, "$options": "i"}},
+            ]
+            if word.isdigit():
+                or_conditions.append({"Year": int(word)})
+            query["$and"].append({"$or": or_conditions})
+    
+    # Apply filters
+    filters = {
+        "Vehicle Type": form_data.get('vehicle_type'),
+        "Main Colour": form_data.get('main_colour'),
+        "Secondary Colour": form_data.get('secondary_colour'),
+        "Fuel": form_data.get('fuel'),
+        "Status": form_data.get('status'),
+        "Location": form_data.get('location')
+    }
+    
+    for key, value in filters.items():
+        if value:
+            query[key] = value
+    
+    # Registration Status
+    registration_status = form_data.get('registration_status')
+    if registration_status == 'Registered':
+        query["Registration No"] = {"$nin": [None, ""]}
+    elif registration_status == 'Unregistered':
+        query["Registration No"] = {"$in": [None, ""]}
+    
+    return query
+
 @app.route('/')
 def index():
     return render_template('form.html')  # Renders the HTML form
-
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -40,13 +92,21 @@ def upload():
 
         # 3. Validate with regex
         if reg_no and not re.match(REG_NO_PATTERN, reg_no):
+            logging.warning(f"Invalid Registration No format: {reg_no}")
             return jsonify({"success": False, "message": "Invalid Registration No format."}), 400
 
-        # Convert Year, Capacity to int as previously shown, etc.
-        year_val = int(request.form.get('Year', '').strip())        
-        capacity_val = int(request.form.get('Capacity', '').strip())
+        # Convert Year, Capacity to int
+        year_str = request.form.get('Year', '').strip()
+        capacity_str = request.form.get('Capacity', '').strip()
+        
+        if not year_str.isdigit() or not capacity_str.isdigit():
+            logging.warning("Year and/or Capacity are not valid integers.")
+            return jsonify({"success": False, "message": "Year and Capacity must be valid integers."}), 400
 
-        # If 'Secondary Colour' is "None", store empty string
+        year_val = int(year_str)        
+        capacity_val = int(capacity_str)
+
+        # Handle Secondary Colour
         secondary_colour = request.form.get('Secondary Colour', '').strip()
         if secondary_colour.lower() == 'none':
             secondary_colour = ""
@@ -70,141 +130,57 @@ def upload():
 
         # 4. Insert into MongoDB
         result = collection.insert_one(vehicle_data)
-        print(f"Data successfully inserted with ID: {result.inserted_id}")
+        logging.info(f"Data successfully inserted with ID: {result.inserted_id}")
         return jsonify({"success": True, "message": "Data uploaded successfully!"}), 200
 
     except ValueError:
         # If int() conversions fail
+        logging.error("Year and Capacity must be valid integers.")
         return jsonify({"success": False, "message": "Year and Capacity must be valid integers."}), 400
     except Exception as e:
-        print(f"Error inserting data: {e}")
+        logging.error(f"Error inserting data: {e}")
         return jsonify({"success": False, "message": "Error uploading data."}), 500
-
-
 
 @app.route('/view_fleet', methods=['GET', 'POST'])
 def view_fleet():
     try:
-        query = {}
         if request.method == 'POST':
-            # Get the search term from the form
-            search_term = request.form.get('search', '').strip()
-            
-            if search_term:
-                # Split the search term into individual words
-                search_words = search_term.split()
-                
-                # Create a list of regex queries for each word
-                query["$and"] = []
-                for word in search_words:
-                    word_query = {
-                        "$or": [
-                            {"Registration No": {"$regex": word, "$options": "i"}},
-                            {"Make": {"$regex": word, "$options": "i"}},
-                            {"Model": {"$regex": word, "$options": "i"}},
-                            {"Chassis No": {"$regex": word, "$options": "i"}},
-                            {"Year": {"$regex": word, "$options": "i"}}
-                        ]
-                    }
-                    query["$and"].append(word_query)
-            
-            # Apply filters from dropdowns
-            vehicle_type = request.form.get('vehicle_type')
-            main_colour = request.form.get('main_colour')
-            secondary_colour = request.form.get('secondary_colour')
-            fuel = request.form.get('fuel')
-            status = request.form.get('status')
-            location = request.form.get('location')
-            registration_status = request.form.get('registration_status')  # Get the new dropdown value
+            form_data = request.form
+        else:
+            form_data = request.args  # To handle GET requests if needed
 
-            # Update the query based on selected filters
-            if vehicle_type:
-                query["Vehicle Type"] = vehicle_type
-            if main_colour:
-                query["Main Colour"] = main_colour
-            if secondary_colour:
-                query["Secondary Colour"] = secondary_colour
-            if fuel:
-                query["Fuel"] = fuel
-            if status:
-                query["Status"] = status
-            if location:
-                query["Location"] = location
-
-            # Handle registration status filtering
-            if registration_status == 'Registered':
-                query["Registration No"] = {"$ne": None, "$ne": ""}  # Ensure that the 'Registration No' field is neither null nor empty
-            elif registration_status == 'Unregistered':
-                query["Registration No"] = {"$in": [None, ""]}  # Ensure that the 'Registration No' field is null or empty
-
-        # Fetch vehicles from MongoDB based on the query
+        query = build_query(form_data if request.method == 'POST' else {})
         vehicles = list(collection.find(query))
         for vehicle in vehicles:
             vehicle['_id'] = str(vehicle['_id'])  # Convert ObjectId to string for rendering
         return render_template('viewfleet.html', vehicles=vehicles)  # Render HTML template
     except Exception as e:
-        print(f"Error fetching data: {e}")
+        logging.error(f"Error fetching data: {e}")
         return jsonify({"success": False, "message": "Error fetching data."}), 500
-        
+
 @app.route('/export_fleet', methods=['GET'])
 def export_fleet():
     try:
-        # Get filter parameters from the query string
-        search_term = request.args.get('search', '').strip()
-        vehicle_type = request.args.get('vehicle_type', '')
-        main_colour = request.args.get('main_colour', '')
-        secondary_colour = request.args.get('secondary_colour', '')
-        fuel = request.args.get('fuel', '')
-        status = request.args.get('status', '')
-        location = request.args.get('location', '')
-        registration_status = request.args.get('registration_status', '')
-
-        # Build the query based on filters
-        query = {}
-        if search_term:
-            query = {"$or": [
-                {"Registration No": {"$regex": search_term, "$options": "i"}},
-                {"Make": {"$regex": search_term, "$options": "i"}},
-                {"Model": {"$regex": search_term, "$options": "i"}},
-                {"Chassis No": {"$regex": search_term, "$options": "i"}},
-                {"Year": {"$regex": search_term, "$options": "i"}}
-            ]}
-        
-        if vehicle_type:
-            query["Vehicle Type"] = vehicle_type
-        if main_colour:
-            query["Main Colour"] = main_colour
-        if secondary_colour:
-            query["Secondary Colour"] = secondary_colour
-        if fuel:
-            query["Fuel"] = fuel
-        if status:
-            query["Status"] = status
-        if location:
-            query["Location"] = location
-
-        if registration_status == 'Registered':
-            query["Registration No"] = {"$ne": None, "$ne": ""}
-        elif registration_status == 'Unregistered':
-            query["Registration No"] = {"$in": [None, ""]}
-        
-        # Fetch filtered vehicles from MongoDB
+        query = build_query(request.args)
         vehicles = list(collection.find(query))
         for vehicle in vehicles:
-            vehicle.pop('_id')  # Remove _id field from data
+            vehicle.pop('_id', None)  # Safely remove _id if it exists
 
-        # Convert the filtered data to a pandas DataFrame
+        if not vehicles:
+            logging.info("No data to export.")
+            return jsonify({"success": False, "message": "No data to export."}), 400
+
         df = pd.DataFrame(vehicles)
 
-        # Save the DataFrame to an Excel file
-        excel_file = '/tmp/fleet_data_filtered.xlsx'  # Path to save the file temporarily
-        df.to_excel(excel_file, index=False)
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx') as tmp:
+            excel_file = tmp.name
+            df.to_excel(excel_file, index=False)
 
         # Load the workbook and sheet to apply formatting
         wb = load_workbook(excel_file)
         ws = wb.active
 
-        # Apply right alignment to all cells
+        # Apply right alignment to all cells except headers
         for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
             for cell in row:
                 cell.alignment = Alignment(horizontal='right')
@@ -212,22 +188,22 @@ def export_fleet():
         # Save the modified Excel file
         wb.save(excel_file)
 
-        # Send the Excel file as a download to the client
+        logging.info(f"Exported data to Excel file: {excel_file}")
         return send_file(excel_file, as_attachment=True, download_name='fleet_data.xlsx')
     except Exception as e:
-        print(f"Error exporting data: {e}")
+        logging.error(f"Error exporting data: {e}")
         return jsonify({"success": False, "message": "Error exporting data."}), 500
-
-
 
 @app.route('/edit/<id>', methods=['GET', 'POST'])
 def edit_vehicle(id):
     try:
         vehicle = collection.find_one({"_id": ObjectId(id)})
         if not vehicle:
+            logging.warning(f"Vehicle not found with ID: {id}")
             return jsonify({"success": False, "message": "Vehicle not found."}), 404
 
         if request.method == 'GET':
+            vehicle['_id'] = str(vehicle['_id'])  # Convert ObjectId to string
             return render_template('editvehicle.html', vehicle=vehicle)
 
         if request.method == 'POST':
@@ -236,16 +212,23 @@ def edit_vehicle(id):
             reg_no = reg_no_raw.upper()
             # Validate format
             if reg_no and not re.match(REG_NO_PATTERN, reg_no):
+                logging.warning(f"Invalid Registration No format during edit: {reg_no}")
                 return jsonify({
                     "success": False,
                     "message": "Invalid Registration No format."
                 }), 400
 
             # Convert Year, Capacity to integers
-            year_val = int(request.form.get('Year', '').strip())
-            capacity_val = int(request.form.get('Capacity', '').strip())
+            year_str = request.form.get('Year', '').strip()
+            capacity_str = request.form.get('Capacity', '').strip()
+            if not year_str.isdigit() or not capacity_str.isdigit():
+                logging.warning("Year and/or Capacity are not valid integers during edit.")
+                return jsonify({"success": False, "message": "Year and Capacity must be valid integers."}), 400
 
-            # Secondary Colour
+            year_val = int(year_str)
+            capacity_val = int(capacity_str)
+
+            # Handle Secondary Colour
             secondary_colour = request.form.get('Secondary Colour', '').strip()
             if secondary_colour.lower() == 'none':
                 secondary_colour = ""
@@ -266,29 +249,33 @@ def edit_vehicle(id):
                 "Location": request.form.get('Location', '').strip()
             }
 
-            collection.update_one({"_id": ObjectId(id)}, {"$set": updated_data})
-            return redirect('/view_fleet')
+            result = collection.update_one({"_id": ObjectId(id)}, {"$set": updated_data})
+            if result.modified_count == 1:
+                logging.info(f"Vehicle with ID {id} updated successfully.")
+            else:
+                logging.info(f"No changes made to vehicle with ID {id}.")
+            return redirect(url_for('view_fleet'))
 
     except ValueError:
+        logging.error("Year and Capacity must be valid integers during edit.")
         return jsonify({"success": False, "message": "Year and Capacity must be valid integers."}), 400
     except Exception as e:
-        print(f"Error editing vehicle: {e}")
+        logging.error(f"Error editing vehicle: {e}")
         return jsonify({"success": False, "message": "Error editing vehicle."}), 500
-
 
 @app.route('/delete/<id>', methods=['POST'])
 def delete_vehicle(id):
     try:
         result = collection.delete_one({"_id": ObjectId(id)})
         if result.deleted_count == 1:
-            print(f"Vehicle with ID {id} deleted successfully.")
-            return redirect('/view_fleet')
+            logging.info(f"Vehicle with ID {id} deleted successfully.")
+            return redirect(url_for('view_fleet'))
         else:
+            logging.warning(f"Vehicle not found for deletion with ID: {id}")
             return jsonify({"success": False, "message": "Vehicle not found."}), 404
     except Exception as e:
-        print(f"Error deleting vehicle: {e}")
+        logging.error(f"Error deleting vehicle: {e}")
         return jsonify({"success": False, "message": "Error deleting vehicle."}), 500    
-        
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)  # Consider setting debug=False in production

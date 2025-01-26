@@ -11,6 +11,12 @@
     rel="stylesheet"
   >
 
+  <!-- Bootstrap Icons CSS -->
+  <link 
+    rel="stylesheet" 
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+  />
+
   <!-- Combined CSS Styles -->
   <style>
     /* ============ NAVBAR & BODY PADDING ============ */
@@ -92,33 +98,32 @@
 
     /* ============ STICKY COLUMN STYLING ============ */
 
-/* Existing sticky column styles */
-.sticky-column {
-    position: sticky;
-    left: 0;
-    background-color: #fff; /* Fully opaque background */
-    z-index: 10; /* Ensure it stays above other cells */
-    white-space: nowrap; /* Prevent text wrapping */
-    border-right: 1px solid #ddd; /* Right border for separation */
-    box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.1); /* Optional shadow */
-}
+    /* Existing sticky column styles */
+    .sticky-column {
+        position: sticky;
+        left: 0;
+        background-color: #fff; /* Fully opaque background */
+        z-index: 10; /* Ensure it stays above other cells */
+        white-space: nowrap; /* Prevent text wrapping */
+        border-right: 1px solid #ddd; /* Right border for separation */
+        box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.1); /* Optional shadow */
+    }
 
-/* Header cell styling */
-thead th.sticky-column {
-    background-color: #f4f4f4; /* Match your header background */
-    z-index: 11; /* Higher than body cells */
-    border-right: 1px solid #ddd; /* Right border for consistency */
-}
+    /* Header cell styling */
+    thead th.sticky-column {
+        background-color: #f4f4f4; /* Match your header background */
+        z-index: 11; /* Higher than body cells */
+        border-right: 1px solid #ddd; /* Right border for consistency */
+    }
 
-/* Alternating background colors for body cells in the sticky column */
-tbody tr:nth-child(odd) td.sticky-column {
-    background-color: #ffffff; /* White for odd rows */
-}
+    /* Alternating background colors for body cells in the sticky column */
+    tbody tr:nth-child(odd) td.sticky-column {
+        background-color: #ffffff; /* White for odd rows */
+    }
 
-tbody tr:nth-child(even) td.sticky-column {
-    background-color: #f9f9f9; /* Light grey for even rows */
-}
-
+    tbody tr:nth-child(even) td.sticky-column {
+        background-color: #f9f9f9; /* Light grey for even rows */
+    }
   </style>
 </head>
 <body>
@@ -379,7 +384,7 @@ tbody tr:nth-child(even) td.sticky-column {
             ) }}"
         class="btn btn-success"
       >
-        Export Data to Excel
+        <i class="bi bi-file-earmark-excel"></i> Export Data to Excel
       </a>
     </div>
   </div>
