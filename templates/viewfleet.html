@@ -90,35 +90,36 @@
       margin: 0;
     }
 
-    /* 1) Sticky column for both header (th) and body (td) */
-    .sticky-column {
-        position: sticky;
-        left: 0;
-        background-color: #fff;   /* Solid background so content doesn't show through */
-        z-index: 10;             /* Must be higher than normal cells */
-        white-space: nowrap;     /* Prevents text from wrapping if column is narrow */
-    }
+    /* ============ STICKY COLUMN STYLING ============ */
+.sticky-column {
+    position: sticky;
+    left: 0;
+    background-color: #fff; /* Fully opaque background */
+    z-index: 10; /* Ensure it stays above other cells */
+    white-space: nowrap; /* Prevent text wrapping */
+    /* Optional: Add a right border for separation */
+    border-right: 1px solid #ddd;
+}
 
-    /* 2) If your table header row is also sticky, give that cell a higher z-index so it stays on top */
-    thead th.sticky-column {
-        background-color: #f4f4f4; /* or match your header color */
-        z-index: 11;              /* Slightly higher than the body cells */
-    }
+/* Ensure the header cell has a higher z-index and matches background */
+thead th.sticky-column {
+    background-color: #f4f4f4; /* Match your header background */
+    z-index: 11; /* Higher than body cells */
+    /* Optional: Add a right border for consistency */
+    border-right: 1px solid #ddd;
+}
 
-    /* 3) If you want the entire header row sticky, you can do: */
-    thead th {
-        position: sticky;
-        top: 0;
-        background-color: #f4f4f4;
-        z-index: 5; /* Ensure it stays above the table rows */
-    }
+/* Ensure body cells also have a solid background */
+tbody td.sticky-column {
+    background-color: #fff; /* Same as the sticky-column */
+    z-index: 10;
+}
 
-    /* Responsive adjustments for the form */
-    @media (max-width: 767.98px) {
-      .form-container .form-row > div {
-        margin-bottom: 15px;
-      }
-    }
+/* Optional: Add a subtle shadow to the sticky column for better separation */
+.sticky-column {
+    box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.1);
+}
+
   </style>
 </head>
 <body>
