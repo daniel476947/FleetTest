@@ -91,33 +91,32 @@
     }
 
     /* ============ STICKY COLUMN STYLING ============ */
+
+/* Existing sticky column styles */
 .sticky-column {
     position: sticky;
     left: 0;
     background-color: #fff; /* Fully opaque background */
     z-index: 10; /* Ensure it stays above other cells */
     white-space: nowrap; /* Prevent text wrapping */
-    /* Optional: Add a right border for separation */
-    border-right: 1px solid #ddd;
+    border-right: 1px solid #ddd; /* Right border for separation */
+    box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.1); /* Optional shadow */
 }
 
-/* Ensure the header cell has a higher z-index and matches background */
+/* Header cell styling */
 thead th.sticky-column {
     background-color: #f4f4f4; /* Match your header background */
     z-index: 11; /* Higher than body cells */
-    /* Optional: Add a right border for consistency */
-    border-right: 1px solid #ddd;
+    border-right: 1px solid #ddd; /* Right border for consistency */
 }
 
-/* Ensure body cells also have a solid background */
-tbody td.sticky-column {
-    background-color: #fff; /* Same as the sticky-column */
-    z-index: 10;
+/* Alternating background colors for body cells in the sticky column */
+tbody tr:nth-child(odd) td.sticky-column {
+    background-color: #ffffff; /* White for odd rows */
 }
 
-/* Optional: Add a subtle shadow to the sticky column for better separation */
-.sticky-column {
-    box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.1);
+tbody tr:nth-child(even) td.sticky-column {
+    background-color: #f9f9f9; /* Light grey for even rows */
 }
 
   </style>
