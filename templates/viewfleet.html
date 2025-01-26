@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fleet Management - View Fleet</title>
 
   <!-- Bootstrap 5 CSS -->
@@ -113,8 +113,12 @@
         z-index: 5; /* Ensure it stays above the table rows */
     }
 
-
-
+    /* Responsive adjustments for the form */
+    @media (max-width: 767.98px) {
+      .form-container .form-row > div {
+        margin-bottom: 15px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -159,122 +163,140 @@
     <h1 class="text-center mb-4">Fleet Management - View Fleet</h1>
     
     <!-- Search Form -->
-    <div class="mb-4 d-flex justify-content-center">
-      <form method="POST" class="w-50">
-        <!-- Search Bar -->
-        <input 
-          type="text" 
-          name="search" 
-          class="form-control mb-3" 
-          placeholder="Search by Registration No, Make, Model or Chassis No"
-        >
-        
-        <!-- Filter Dropdowns -->
-        <div class="d-flex justify-content-between flex-wrap">
-          <!-- Registered/Unregistered Dropdown -->
-          <select name="registration_status" class="form-select w-20 mb-3">
-            <option value="">Registration Status</option>
-            <option value="Registered">Registered</option>
-            <option value="Unregistered">Unregistered</option>
-          </select>
+    <div class="mb-4">
+      <form method="POST">
+        <div class="row g-3">
+          <!-- Search Bar -->
+          <div class="col-12 col-md-6">
+            <input 
+              type="text" 
+              name="search" 
+              class="form-control" 
+              placeholder="Search by Registration No, Make, Model or Chassis No"
+            >
+          </div>
 
-          <select name="vehicle_type" class="form-select w-20 mx-2">
-            <option value="">Vehicle Type</option>
-            <option value="Sedan">Sedan</option>
-            <option value="Hatchback">Hatchback</option>
-            <option value="SUV">SUV</option>
-            <option value="Mini Van">Mini Van</option>
-            <option value="Van">Van</option>
-            <option value="Truck">Truck</option>
-            <option value="Wagon">Wagon</option>
-            <option value="Coupe">Coupe</option>
-            <option value="Mini Bus">Mini Bus</option>
-            <option value="Medium Bus">Medium Bus</option>
-            <option value="Large Bus">Large Bus</option>
-            <option value="Pick up">Pick up</option>
-            <option value="Convertible">Convertible</option>
-            <option value="Tractor">Tractor</option>
-            <option value="Forklift">Forklift</option>
-            <option value="Machinery">Machinery</option>
-          </select>
+          <!-- Registration Status Dropdown -->
+          <div class="col-6 col-md-3 col-lg-2">
+            <select name="registration_status" class="form-select">
+              <option value="">Registration Status</option>
+              <option value="Registered">Registered</option>
+              <option value="Unregistered">Unregistered</option>
+            </select>
+          </div>
 
-          <select name="main_colour" class="form-select w-20 mx-2">
-            <option value="">Main Colour</option>
-            <option value="Beige">Beige</option>
-            <option value="Black">Black</option>
-            <option value="Blue">Blue</option>
-            <option value="Brown">Brown</option>
-            <option value="Burgundy">Burgundy</option>
-            <option value="Gold">Gold</option>
-            <option value="Gray">Gray</option>
-            <option value="Green">Green</option>
-            <option value="Orange">Orange</option>
-            <option value="Pink">Pink</option>
-            <option value="Purple">Purple</option>
-            <option value="Red">Red</option>
-            <option value="Silver">Silver</option>
-            <option value="Teal">Teal</option>
-            <option value="Turquoise">Turquoise</option>
-            <option value="White">White</option>
-            <option value="Wine Red">Wine Red</option>
-            <option value="Yellow">Yellow</option>
-          </select>
+          <!-- Vehicle Type Dropdown -->
+          <div class="col-6 col-md-3 col-lg-2">
+            <select name="vehicle_type" class="form-select">
+              <option value="">Vehicle Type</option>
+              <option value="Sedan">Sedan</option>
+              <option value="Hatchback">Hatchback</option>
+              <option value="SUV">SUV</option>
+              <option value="Mini Van">Mini Van</option>
+              <option value="Van">Van</option>
+              <option value="Truck">Truck</option>
+              <option value="Wagon">Wagon</option>
+              <option value="Coupe">Coupe</option>
+              <option value="Mini Bus">Mini Bus</option>
+              <option value="Medium Bus">Medium Bus</option>
+              <option value="Large Bus">Large Bus</option>
+              <option value="Pick up">Pick up</option>
+              <option value="Convertible">Convertible</option>
+              <option value="Tractor">Tractor</option>
+              <option value="Forklift">Forklift</option>
+              <option value="Machinery">Machinery</option>
+            </select>
+          </div>
 
-          <select name="secondary_colour" class="form-select w-20 mx-2">
-            <option value="">Secondary Colour</option>
-            <option value="Beige">Beige</option>
-            <option value="Black">Black</option>
-            <option value="Blue">Blue</option>
-            <option value="Brown">Brown</option>
-            <option value="Burgundy">Burgundy</option>
-            <option value="Gold">Gold</option>
-            <option value="Gray">Gray</option>
-            <option value="Green">Green</option>
-            <option value="Orange">Orange</option>
-            <option value="Pink">Pink</option>
-            <option value="Purple">Purple</option>
-            <option value="Red">Red</option>
-            <option value="Silver">Silver</option>
-            <option value="Teal">Teal</option>
-            <option value="Turquoise">Turquoise</option>
-            <option value="White">White</option>
-            <option value="Wine Red">Wine Red</option>
-            <option value="Yellow">Yellow</option>
-          </select>
+          <!-- Main Colour Dropdown -->
+          <div class="col-6 col-md-3 col-lg-2">
+            <select name="main_colour" class="form-select">
+              <option value="">Main Colour</option>
+              <option value="Beige">Beige</option>
+              <option value="Black">Black</option>
+              <option value="Blue">Blue</option>
+              <option value="Brown">Brown</option>
+              <option value="Burgundy">Burgundy</option>
+              <option value="Gold">Gold</option>
+              <option value="Gray">Gray</option>
+              <option value="Green">Green</option>
+              <option value="Orange">Orange</option>
+              <option value="Pink">Pink</option>
+              <option value="Purple">Purple</option>
+              <option value="Red">Red</option>
+              <option value="Silver">Silver</option>
+              <option value="Teal">Teal</option>
+              <option value="Turquoise">Turquoise</option>
+              <option value="White">White</option>
+              <option value="Wine Red">Wine Red</option>
+              <option value="Yellow">Yellow</option>
+            </select>
+          </div>
 
-          <!-- Other Dropdowns -->
-          <select name="fuel" class="form-select w-20 mx-2">
-            <option value="">Fuel</option>
-            <option value="Gas">Gas</option>
-            <option value="Diesel">Diesel</option>
-          </select>
+          <!-- Secondary Colour Dropdown -->
+          <div class="col-6 col-md-3 col-lg-2">
+            <select name="secondary_colour" class="form-select">
+              <option value="">Secondary Colour</option>
+              <option value="Beige">Beige</option>
+              <option value="Black">Black</option>
+              <option value="Blue">Blue</option>
+              <option value="Brown">Brown</option>
+              <option value="Burgundy">Burgundy</option>
+              <option value="Gold">Gold</option>
+              <option value="Gray">Gray</option>
+              <option value="Green">Green</option>
+              <option value="Orange">Orange</option>
+              <option value="Pink">Pink</option>
+              <option value="Purple">Purple</option>
+              <option value="Red">Red</option>
+              <option value="Silver">Silver</option>
+              <option value="Teal">Teal</option>
+              <option value="Turquoise">Turquoise</option>
+              <option value="White">White</option>
+              <option value="Wine Red">Wine Red</option>
+              <option value="Yellow">Yellow</option>
+            </select>
+          </div>
 
-          <select name="status" class="form-select w-20 mx-2">
-            <option value="">Status</option>
-            <option value="Active">Active</option>
-            <option value="Parked">Parked</option>
-            <option value="Out of Order">Out of Order</option>
-          </select>
+          <!-- Fuel Dropdown -->
+          <div class="col-6 col-md-3 col-lg-2">
+            <select name="fuel" class="form-select">
+              <option value="">Fuel</option>
+              <option value="Gas">Gas</option>
+              <option value="Diesel">Diesel</option>
+            </select>
+          </div>
 
-          <select name="location" class="form-select w-20 mx-2">
-            <option value="">Location</option>
-            <option value="Prashad Nagar">Prashad Nagar</option>
-            <option value="Eccles">Eccles</option>
-          </select>
-        </div>
+          <!-- Status Dropdown -->
+          <div class="col-6 col-md-3 col-lg-2">
+            <select name="status" class="form-select">
+              <option value="">Status</option>
+              <option value="Active">Active</option>
+              <option value="Parked">Parked</option>
+              <option value="Out of Order">Out of Order</option>
+            </select>
+          </div>
 
-        <!-- Apply Button Below Filters -->
-        <div class="text-center mt-3">
-          <button type="submit" class="btn btn-primary">Search</button>
+          <!-- Location Dropdown -->
+          <div class="col-6 col-md-3 col-lg-2">
+            <select name="location" class="form-select">
+              <option value="">Location</option>
+              <option value="Prashad Nagar">Prashad Nagar</option>
+              <option value="Eccles">Eccles</option>
+            </select>
+          </div>
+
+          <!-- Apply Button -->
+          <div class="col-12 text-center">
+            <button type="submit" class="btn btn-primary">Search</button>
+          </div>
         </div>
       </form>
     </div>
-
     
     <div class="text-end mb-2">
       <strong>{{ vehicles|length }} records found</strong>
     </div>
-    
 
     <!-- Vehicle Table -->
     <div class="table-container">
@@ -295,6 +317,7 @@
             <th>Model No</th>
             <th>Status</th>
             <th>Location</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
