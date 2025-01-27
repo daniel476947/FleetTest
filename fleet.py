@@ -77,9 +77,23 @@ def build_query(form_data):
     
     return query
 
-@app.route('/')
-def index():
-    return render_template('form.html')  # Renders the HTML form
+@app.route('/', methods=['GET', 'POST'])
+def view_fleet():
+    try:
+        if request.method == 'POST':
+            form_data = request.form
+        else:
+            form_data = request.args  # To handle GET requests if needed
+
+        query = build_query(form_data if request.method == 'POST' else {})
+        vehicles = list(collection.find(query))
+        for vehicle in vehicles:
+            vehicle['_id'] = str(vehicle['_id'])  # Convert ObjectId to string for rendering
+        return render_template('viewfleet.html', vehicles=vehicles)  # Render HTML template
+    except Exception as e:
+        logging.error(f"Error fetching data: {e}")
+        return jsonify({"success": False, "message": "Error fetching data."}), 500
+
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -141,22 +155,7 @@ def upload():
         logging.error(f"Error inserting data: {e}")
         return jsonify({"success": False, "message": "Error uploading data."}), 500
 
-@app.route('/view_fleet', methods=['GET', 'POST'])
-def view_fleet():
-    try:
-        if request.method == 'POST':
-            form_data = request.form
-        else:
-            form_data = request.args  # To handle GET requests if needed
 
-        query = build_query(form_data if request.method == 'POST' else {})
-        vehicles = list(collection.find(query))
-        for vehicle in vehicles:
-            vehicle['_id'] = str(vehicle['_id'])  # Convert ObjectId to string for rendering
-        return render_template('viewfleet.html', vehicles=vehicles)  # Render HTML template
-    except Exception as e:
-        logging.error(f"Error fetching data: {e}")
-        return jsonify({"success": False, "message": "Error fetching data."}), 500
 
 @app.route('/export_fleet', methods=['GET'])
 def export_fleet():
@@ -276,6 +275,10 @@ def delete_vehicle(id):
     except Exception as e:
         logging.error(f"Error deleting vehicle: {e}")
         return jsonify({"success": False, "message": "Error deleting vehicle."}), 500    
+
+@app.route('/form')
+def index():
+    return render_template('form.html')  # Renders the HTML form
 
 if __name__ == '__main__':
     app.run(debug=True)  # Consider setting debug=False in production
