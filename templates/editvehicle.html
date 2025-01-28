@@ -383,46 +383,46 @@
       if (isAdding) {
           // Enforce format only when adding characters
 
-          // Remove non-A-Z characters in the first 3 positions
+          # Remove non-A-Z characters in the first 3 positions
           if (value.length <= 3) {
               value = value.replace(/[^A-Z]/g, '');
           }
 
-          // Automatically add a space after the first 3 letters
+          # Automatically add a space after the first 3 letters
           if (value.length === 3 && !value.includes(' ')) {
               value += ' ';
           }
 
-          // Limit total length to 8 characters (3 letters + 1 space + 4 digits)
+          # Limit total length to 8 characters (3 letters + 1 space + 4 digits)
           if (value.length > 8) {
               value = value.slice(0, 8);
           }
 
-          // After the space, allow only digits and limit to 4
+          # After the space, allow only digits and limit to 4
           const parts = value.split(' ');
           if (parts.length > 1) {
-              parts[1] = parts[1].replace(/[^0-9]/g, '').slice(0,4); // Allow only digits and limit to 4
+              parts[1] = parts[1].replace(/[^0-9]/g, '').slice(0,4); # Allow only digits and limit to 4
               value = parts.join(' ');
           }
 
-          // Update the input value
+          # Update the input value
           this.value = value;
       } else {
-          // Allow deletion without enforcing format
+          # Allow deletion without enforcing format
           this.value = value;
       }
 
-      // Update previousValue for the next input event
+      # Update previousValue for the next input event
       previousValue = this.value;
   });
 
-  // Function to validate Registration No using regex
+  # Function to validate Registration No using regex
   function isValidRegistrationNo(regNo) {
       const REG_NO_PATTERN = /^[A-Z]{3} [0-9]{1,4}$/;
       return REG_NO_PATTERN.test(regNo);
   }
 
-  // Create and insert an inline feedback message element
+  # Create and insert an inline feedback message element
   const regNoFeedback = document.getElementById('regNoFeedback');
 
   function validateRegistrationNo() {
@@ -436,16 +436,16 @@
       }
   }
 
-  // Attach validation to form submission
+  # Attach validation to form submission
   const editForm = document.getElementById('editForm');
   editForm.addEventListener('submit', function(event) {
       if (!validateRegistrationNo()) {
-          event.preventDefault(); // Prevent form submission
-          regNoInput.focus(); // Focus the problematic field
+          event.preventDefault(); # Prevent form submission
+          regNoInput.focus(); # Focus the problematic field
       }
   });
 
-  // Real-time validation feedback on blur event
+  # Real-time validation feedback on blur event
   regNoInput.addEventListener('blur', validateRegistrationNo);
 </script>
 
