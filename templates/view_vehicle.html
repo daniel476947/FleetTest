@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- **Important**: Meta viewport tag for responsiveness -->
+    <!-- Meta viewport tag for responsiveness -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>View Vehicle Details</title>
 
@@ -20,7 +20,7 @@
 
     <!-- Custom CSS Styles -->
     <style>
-        /* ============ NAVBAR STYLES ============ */
+        /* ============ NAVBAR & BODY PADDING ============ */
         .navbar {
           background-color: black;
           padding-top: 15px;
@@ -120,6 +120,9 @@
             font-size: 0.8rem;
             padding: 0.3rem 0.5rem;
           }
+          .navbar-brand img {
+            height: 30px;
+          }
         }
 
         /* ============ STICKY COLUMN STYLING ============ */
@@ -208,7 +211,8 @@
     <h1 class="text-center mb-4">Vehicle Details</h1>
     <div class="card">
         <div class="card-header bg-primary text-white">
-            <h4>{{ vehicle['Registration No'] }}</h4>
+            <!-- **Modified Line**: Display "Unregistered" if Registration No is missing -->
+            <h4>{{ vehicle['Registration No'] or 'Unregistered' }}</h4>
         </div>
         <div class="card-body">
             <!-- Responsive Table -->
