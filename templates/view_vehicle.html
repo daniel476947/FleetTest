@@ -3,17 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <title>View Vehicle Details</title>
+
     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link 
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" 
+      rel="stylesheet"
+    >
+
+    <!-- Bootstrap Icons CSS -->
+    <link 
+      rel="stylesheet" 
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+
+    <!-- Combined CSS Styles -->
+    <style>
+        /* ============ NAVBAR & BODY PADDING ============ */
+        .navbar {
+          background-color: black;
+          padding-top: 15px;
+          padding-bottom: 15px;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          z-index: 1000;
+        }
+
+        .navbar-nav .nav-link {
+          color: white !important;
+        }
+
+        .navbar-nav .nav-link:hover {
+          color: #777684 !important;
+        }
+
+        .navbar-container {
+          padding-left: 30px;
+          padding-right: 30px;
+        }
+
+        /* Add padding to the body to prevent content from being hidden behind the navbar */
+        body {
+          padding-top: 75px; /* Adjust this based on your navbar height */
+        }
+
+        /* ============ TABLE STYLING ============ */
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        th, td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: left;
+        }
+        th {
+          background-color: #f4f4f4;
+          font-weight: bold;
+          width: 30%;
+        }
+        tr:nth-child(even) {
+          background-color: #f9f9f9;
+        }
+        .table-container {
+          margin-top: 50px;
+          overflow-x: auto;
+        }
+
+        /* ============ FOOTER STYLES ============ */
+        .footer {
+          background-color: black;
+          color: white;
+          padding: 20px 0;
+          text-align: center;
+          position: relative;
+          bottom: 0;
+          width: 100%;
+          margin-top: 100px; /* Add margin on top */
+        }
+
+        .footer a {
+          color: #f8f9fa;
+          text-decoration: none;
+        }
+
+        .footer a:hover {
+          text-decoration: underline;
+        }
+
+        .footer p {
+          margin: 0;
+        }
+
+        /* ============ RESPONSIVE CARD STYLING ============ */
+        .card-header h4 {
+          font-size: 1.5rem;
+        }
+
+        @media (max-width: 576px) {
+          .card-header h4 {
+            font-size: 1.2rem;
+          }
+        }
+    </style>
 </head>
 <body>
-    <div class="container my-5">
-        <h2 class="mb-4">Vehicle Details</h2>
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h4>{{ vehicle['Registration No'] }}</h4>
-            </div>
-            <div class="card-body">
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid navbar-container"> 
+      <!-- Logo on the left -->
+      <a class="navbar-brand" href="#">
+        <img src="/static/logo.jpg" alt="Company Logo" style="height: 40px;">
+      </a>
+
+      <!-- Toggle button for mobile view -->
+      <button 
+        class="navbar-toggler" 
+        type="button" 
+        data-bs-toggle="collapse" 
+        data-bs-target="#navbarNav" 
+        aria-controls="navbarNav" 
+        aria-expanded="false" 
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Navbar links -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Fleet</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/form">Form</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- PAGE TITLE & CONTAINER -->
+  <div class="container my-5">
+    <h1 class="text-center mb-4">Vehicle Details</h1>
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4>{{ vehicle['Registration No'] }}</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
                 <table class="table table-bordered">
                     <tbody>
                         <tr>
@@ -66,16 +206,36 @@
                         </tr>
                     </tbody>
                 </table>
-                <a href="{{ url_for('view_fleet') }}" class="btn btn-secondary">Back to Fleet</a>
-                <a href="{{ url_for('edit_vehicle', id=vehicle['_id']) }}" class="btn btn-primary">Edit</a>
+            </div>
+            <div class="mt-4 d-flex flex-wrap gap-2">
+                <a href="{{ url_for('view_fleet') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Fleet
+                </a>
+                <a href="{{ url_for('edit_vehicle', id=vehicle['_id']) }}" class="btn btn-primary">
+                    <i class="bi bi-pencil-square"></i> Edit
+                </a>
                 <form action="{{ url_for('delete_vehicle', id=vehicle['_id']) }}" method="POST" style="display:inline;">
-                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this vehicle?');">Delete</button>
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this vehicle?');">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
                 </form>
             </div>
         </div>
     </div>
+  </div>
 
-    <!-- Bootstrap 5 JS and dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>&copy; 2025 Knight Rider Transportation. All rights reserved.</p>
+    <p>
+      <a href="/privacy-policy">Privacy Policy</a> | 
+      <a href="/terms-of-service">Terms of Service</a>
+    </p>
+  </footer> 
+
+  <!-- Bootstrap 5 JS and dependencies -->
+  <script 
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+  ></script>
 </body>
 </html>
