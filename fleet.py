@@ -304,6 +304,47 @@ def edit_vehicle(id):
             if secondary_colour.lower() == 'none':
                 secondary_colour = ""
 
+            # Start with existing image_ids
+            updated_image_ids = vehicle.get('image_ids', [])
+
+            # Handle Image Deletions (Existing Images)
+            images_to_delete = request.form.getlist('delete_images')  # List of image IDs to delete
+            if images_to_delete:
+                for img_id in images_to_delete:
+                    try:
+                        fs.delete(ObjectId(img_id))
+                        logging.info(f"Deleted image {img_id} associated with vehicle {id}.")
+                        # Remove img_id from updated_image_ids
+                        if img_id in updated_image_ids:
+                            updated_image_ids.remove(img_id)
+                    except gridfs.NoFile:
+                        logging.warning(f"Image {img_id} not found in GridFS.")
+                        error_message = f"Image with ID {img_id} not found."
+                        vehicle['_id'] = str(vehicle['_id'])  # Ensure ID is string
+                        return render_template('editvehicle.html', vehicle=vehicle, error_message=error_message), 404
+                    except Exception as e:
+                        logging.error(f"Error deleting image {img_id}: {e}")
+                        error_message = "An error occurred while deleting images."
+                        vehicle['_id'] = str(vehicle['_id'])  # Ensure ID is string
+                        return render_template('editvehicle.html', vehicle=vehicle, error_message=error_message), 500
+
+            # Handle Image Uploads (New Images)
+            if 'images' in request.files:
+                images = request.files.getlist('images')
+                for image in images:
+                    if image and image.filename and allowed_file(image.filename):
+                        filename = secure_filename(image.filename)
+                        # Save image to GridFS
+                        image_id = fs.put(image.read(), filename=filename, content_type=image.content_type)
+                        updated_image_ids.append(str(image_id))
+                    elif image and image.filename:
+                        # Image has a filename but invalid type
+                        logging.warning(f"Invalid file type for image during edit: {image.filename}")
+                        error_message = f"Invalid file type for image: {image.filename}. Allowed types: png, jpg, jpeg, gif."
+                        vehicle['_id'] = str(vehicle['_id'])  # Ensure ID is string
+                        return render_template('editvehicle.html', vehicle=vehicle, error_message=error_message), 400
+                # If image.filename is empty, skip processing
+
             # Build updated_data dictionary
             updated_data = {
                 "Registration No": reg_no,
@@ -318,60 +359,9 @@ def edit_vehicle(id):
                 "Chassis No": request.form.get('Chassis No', '').strip(),
                 "Model No": request.form.get('Model No', '').strip(),
                 "Status": request.form.get('Status', '').strip(),
-                "Location": request.form.get('Location', '').strip()
+                "Location": request.form.get('Location', '').strip(),
+                "image_ids": updated_image_ids  # Set to the updated list
             }
-
-            # Handle Image Uploads (New Images)
-            if 'images' in request.files:
-                images = request.files.getlist('images')
-                for image in images:
-                    if image and image.filename and allowed_file(image.filename):
-                        filename = secure_filename(image.filename)
-                        # Save image to GridFS
-                        image_id = fs.put(image.read(), filename=filename, content_type=image.content_type)
-                        if 'image_ids' not in updated_data:
-                            updated_data['image_ids'] = []
-                        updated_data['image_ids'].append(str(image_id))
-                    elif image and image.filename:
-                        # Image has a filename but invalid type
-                        logging.warning(f"Invalid file type for image during edit: {image.filename}")
-                        error_message = f"Invalid file type for image: {image.filename}. Allowed types: png, jpg, jpeg, gif."
-                        vehicle['_id'] = str(vehicle['_id'])  # Ensure ID is string
-                        return render_template('editvehicle.html', vehicle=vehicle, error_message=error_message), 400
-
-            # Handle Image Deletions (Existing Images)
-            images_to_delete = request.form.getlist('delete_images')  # List of image IDs to delete
-            if images_to_delete:
-                for img_id in images_to_delete:
-                    try:
-                        fs.delete(ObjectId(img_id))
-                        logging.info(f"Deleted image {img_id} associated with vehicle {id}.")
-                        # Remove img_id from vehicle's image_ids
-                        if 'image_ids' in updated_data:
-                            if img_id in updated_data['image_ids']:
-                                updated_data['image_ids'].remove(img_id)
-                        else:
-                            # Create a new list excluding the deleted image
-                            updated_data['image_ids'] = [img for img in vehicle.get('image_ids', []) if img != img_id]
-                    except gridfs.NoFile:
-                        logging.warning(f"Image {img_id} not found in GridFS.")
-                        # Optionally, set an error message
-                        error_message = f"Image with ID {img_id} not found."
-                        vehicle['_id'] = str(vehicle['_id'])  # Ensure ID is string
-                        return render_template('editvehicle.html', vehicle=vehicle, error_message=error_message), 404
-                    except Exception as e:
-                        logging.error(f"Error deleting image {img_id}: {e}")
-                        error_message = "An error occurred while deleting images."
-                        vehicle['_id'] = str(vehicle['_id'])  # Ensure ID is string
-                        return render_template('editvehicle.html', vehicle=vehicle, error_message=error_message), 500
-
-            # If new images were uploaded, append their IDs to existing list
-            if 'image_ids' in updated_data and 'image_ids' in vehicle:
-                updated_data['image_ids'] = vehicle['image_ids'] + updated_data['image_ids']
-            elif 'image_ids' in updated_data:
-                updated_data['image_ids'] = updated_data['image_ids']
-            else:
-                updated_data['image_ids'] = vehicle.get('image_ids', [])
 
             # Update the vehicle in MongoDB
             result = collection.update_one({"_id": ObjectId(id)}, {"$set": updated_data})
@@ -392,6 +382,7 @@ def edit_vehicle(id):
         error_message = "An unexpected error occurred while editing the vehicle."
         vehicle['_id'] = str(vehicle['_id'])  # Ensure ID is string
         return render_template('editvehicle.html', vehicle=vehicle, error_message=error_message), 500
+
 
 
 @app.route('/delete/<id>', methods=['POST'])

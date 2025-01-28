@@ -138,6 +138,12 @@
 <div class="container mt-5">
     <h1 class="text-center mb-4">Edit Vehicle</h1>
 
+    {% if error_message %}
+        <div class="alert alert-danger" role="alert">
+            {{ error_message }}
+        </div>
+    {% endif %}
+
     <form id="editForm" class="shadow p-4 rounded bg-light" method="POST" enctype="multipart/form-data">
         <!-- Registration No -->
         <div class="mb-3">
@@ -354,6 +360,9 @@
 
   // Get the selected year from the template
   const selectedYear = parseInt({{ vehicle['Year'] | tojson }});
+  
+  // Check if selectedYear is a valid number
+  const isValidYear = !isNaN(selectedYear);
 
   for (let year = currentYear; year >= 1970; year--) {
       const option = document.createElement('option');
@@ -361,7 +370,7 @@
       option.textContent = year;
 
       // Mark the option as selected if it matches the vehicle's year
-      if (year === selectedYear) {
+      if (isValidYear && year === selectedYear) {
           option.selected = true;
       }
 
