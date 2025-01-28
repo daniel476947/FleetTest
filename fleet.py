@@ -270,7 +270,7 @@ def edit_vehicle(id):
         vehicle = collection.find_one({"_id": ObjectId(id)})
         if not vehicle:
             logging.warning(f"Vehicle not found with ID: {id}")
-            return jsonify({"success": False, "message": "Vehicle not found."}), 404
+            return render_template('editvehicle.html', vehicle={}, error_message="Vehicle not found."), 404
 
         if request.method == 'GET':
             vehicle['_id'] = str(vehicle['_id'])  # Convert ObjectId to string
@@ -283,17 +283,18 @@ def edit_vehicle(id):
             # Validate format
             if reg_no and not re.match(REG_NO_PATTERN, reg_no):
                 logging.warning(f"Invalid Registration No format during edit: {reg_no}")
-                return jsonify({
-                    "success": False,
-                    "message": "Invalid Registration No format."
-                }), 400
+                error_message = "Invalid Registration No format. Use 3 letters, a space, and 1-4 digits (e.g., PGG 1567)."
+                vehicle['_id'] = str(vehicle['_id'])  # Ensure ID is string
+                return render_template('editvehicle.html', vehicle=vehicle, error_message=error_message), 400
 
             # Convert Year, Capacity to integers
             year_str = request.form.get('Year', '').strip()
             capacity_str = request.form.get('Capacity', '').strip()
             if not year_str.isdigit() or not capacity_str.isdigit():
                 logging.warning("Year and/or Capacity are not valid integers during edit.")
-                return jsonify({"success": False, "message": "Year and Capacity must be valid integers."}), 400
+                error_message = "Year and Capacity must be valid integers."
+                vehicle['_id'] = str(vehicle['_id'])  # Ensure ID is string
+                return render_template('editvehicle.html', vehicle=vehicle, error_message=error_message), 400
 
             year_val = int(year_str)
             capacity_val = int(capacity_str)
@@ -320,31 +321,10 @@ def edit_vehicle(id):
                 "Location": request.form.get('Location', '').strip()
             }
 
-            # Handle Image Deletions (Existing Images)
-            images_to_delete = request.form.getlist('delete_images')  # List of image IDs to delete
-            if images_to_delete:
-                for img_id in images_to_delete:
-                    if img_id:  # Ensure img_id is not empty
-                        try:
-                            fs.delete(ObjectId(img_id))
-                            logging.info(f"Deleted image {img_id} associated with vehicle {id}.")
-                            # Remove img_id from the existing image_ids list
-                            if 'image_ids' in updated_data:
-                                updated_data['image_ids'].remove(img_id)
-                            else:
-                                updated_data['image_ids'] = [img for img in vehicle.get('image_ids', []) if img != img_id]
-                        except gridfs.NoFile:
-                            logging.warning(f"Image {img_id} not found in GridFS.")
-                            # Optionally, you can decide how to handle missing images
-                        except Exception as e:
-                            logging.error(f"Error deleting image {img_id}: {e}")
-                            return jsonify({"success": False, "message": "Error deleting image."}), 500
-
             # Handle Image Uploads (New Images)
             if 'images' in request.files:
                 images = request.files.getlist('images')
                 for image in images:
-                    # Only process files with a non-empty filename
                     if image and image.filename and allowed_file(image.filename):
                         filename = secure_filename(image.filename)
                         # Save image to GridFS
@@ -353,21 +333,44 @@ def edit_vehicle(id):
                             updated_data['image_ids'] = []
                         updated_data['image_ids'].append(str(image_id))
                     elif image and image.filename:
-                        # Invalid file type
+                        # Image has a filename but invalid type
                         logging.warning(f"Invalid file type for image during edit: {image.filename}")
-                        return jsonify({"success": False, "message": f"Invalid file type for image: {image.filename}"}), 400
-                    # If image.filename is empty, skip processing
+                        error_message = f"Invalid file type for image: {image.filename}. Allowed types: png, jpg, jpeg, gif."
+                        vehicle['_id'] = str(vehicle['_id'])  # Ensure ID is string
+                        return render_template('editvehicle.html', vehicle=vehicle, error_message=error_message), 400
 
-            # Update the vehicle's image_ids list by combining existing and new images
-            if 'image_ids' in updated_data:
-                # If existing image_ids are in updated_data, merge them
-                updated_image_ids = updated_data.get('image_ids', [])
-                # Combine with the current image_ids from the vehicle document
-                current_image_ids = vehicle.get('image_ids', [])
-                # Ensure no duplicates
-                updated_data['image_ids'] = list(set(current_image_ids + updated_image_ids))
+            # Handle Image Deletions (Existing Images)
+            images_to_delete = request.form.getlist('delete_images')  # List of image IDs to delete
+            if images_to_delete:
+                for img_id in images_to_delete:
+                    try:
+                        fs.delete(ObjectId(img_id))
+                        logging.info(f"Deleted image {img_id} associated with vehicle {id}.")
+                        # Remove img_id from vehicle's image_ids
+                        if 'image_ids' in updated_data:
+                            if img_id in updated_data['image_ids']:
+                                updated_data['image_ids'].remove(img_id)
+                        else:
+                            # Create a new list excluding the deleted image
+                            updated_data['image_ids'] = [img for img in vehicle.get('image_ids', []) if img != img_id]
+                    except gridfs.NoFile:
+                        logging.warning(f"Image {img_id} not found in GridFS.")
+                        # Optionally, set an error message
+                        error_message = f"Image with ID {img_id} not found."
+                        vehicle['_id'] = str(vehicle['_id'])  # Ensure ID is string
+                        return render_template('editvehicle.html', vehicle=vehicle, error_message=error_message), 404
+                    except Exception as e:
+                        logging.error(f"Error deleting image {img_id}: {e}")
+                        error_message = "An error occurred while deleting images."
+                        vehicle['_id'] = str(vehicle['_id'])  # Ensure ID is string
+                        return render_template('editvehicle.html', vehicle=vehicle, error_message=error_message), 500
+
+            # If new images were uploaded, append their IDs to existing list
+            if 'image_ids' in updated_data and 'image_ids' in vehicle:
+                updated_data['image_ids'] = vehicle['image_ids'] + updated_data['image_ids']
+            elif 'image_ids' in updated_data:
+                updated_data['image_ids'] = updated_data['image_ids']
             else:
-                # If no new images were uploaded and some images were deleted, ensure updated_data['image_ids'] is correctly set
                 updated_data['image_ids'] = vehicle.get('image_ids', [])
 
             # Update the vehicle in MongoDB
@@ -381,10 +384,14 @@ def edit_vehicle(id):
 
     except ValueError:
         logging.error("Year and Capacity must be valid integers during edit.")
-        return jsonify({"success": False, "message": "Year and Capacity must be valid integers."}), 400
+        error_message = "Year and Capacity must be valid integers."
+        vehicle['_id'] = str(vehicle['_id'])  # Ensure ID is string
+        return render_template('editvehicle.html', vehicle=vehicle, error_message=error_message), 400
     except Exception as e:
         logging.error(f"Error editing vehicle: {e}")
-        return jsonify({"success": False, "message": "Error editing vehicle."}), 500
+        error_message = "An unexpected error occurred while editing the vehicle."
+        vehicle['_id'] = str(vehicle['_id'])  # Ensure ID is string
+        return render_template('editvehicle.html', vehicle=vehicle, error_message=error_message), 500
 
 
 @app.route('/delete/<id>', methods=['POST'])
