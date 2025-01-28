@@ -322,9 +322,9 @@
         <thead>
           <tr>
             <th class="sticky-column">No.</th>
-            <!-- **Added Image Column Header** -->
+            <!-- Added Image Column Header -->
             <th>Image</th>
-            <!-- **End of Image Column Header** -->
+            <!-- End of Image Column Header -->
             <th>Registration No</th>
             <th>Make</th>
             <th>Model</th>
@@ -345,7 +345,7 @@
           {% for vehicle in vehicles %}
             <tr>
               <td class="sticky-column">{{ loop.index }}</td>
-              <!-- **Added Image Cell** -->
+              <!-- Added Image Cell -->
               <td>
                 {% if vehicle.get('image_ids') and vehicle['image_ids']|length > 0 %}
                   <!-- Display the first image -->
@@ -359,7 +359,7 @@
                   <i class="bi bi-image" style="font-size: 1.5rem; color: #ccc;"></i>
                 {% endif %}
               </td>
-              <!-- **End of Image Cell** -->
+              <!-- End of Image Cell -->
               <td>{{ vehicle['Registration No'] }}</td>
               <td>{{ vehicle['Make'] }}</td>
               <td>{{ vehicle['Model'] }}</td>
