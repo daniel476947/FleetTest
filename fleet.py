@@ -179,7 +179,6 @@ def upload():
         logging.error(f"Error inserting data: {e}")
         return jsonify({"success": False, "message": "Error uploading data."}), 500
 
-# ... [existing imports and code]
 
 @app.route('/view/<id>', methods=['GET'])
 def view_vehicle(id):
@@ -198,6 +197,7 @@ def view_vehicle(id):
         logging.error(f"Error viewing vehicle: {e}")
         return jsonify({"success": False, "message": "Error viewing vehicle."}), 500
 
+
 @app.route('/image/<image_id>')
 def get_image(image_id):
     try:
@@ -214,7 +214,7 @@ def get_image(image_id):
             image,
             mimetype=image.content_type,
             as_attachment=False,
-            attachment_filename=image.filename
+            download_name=image.filename  # Updated to 'download_name' for Flask 2.0+
         )
     except gridfs.NoFile:
         app.logger.error(f"No file found with image_id: {image_id}")
@@ -222,6 +222,7 @@ def get_image(image_id):
     except Exception as e:
         app.logger.error(f"Error retrieving image {image_id}: {e}")
         return jsonify({"success": False, "message": "Error retrieving image."}), 500
+
 
 @app.route('/export_fleet', methods=['GET'])
 def export_fleet():
@@ -258,6 +259,7 @@ def export_fleet():
     except Exception as e:
         logging.error(f"Error exporting data: {e}")
         return jsonify({"success": False, "message": "Error exporting data."}), 500
+
 
 @app.route('/edit/<id>', methods=['GET', 'POST'])
 def edit_vehicle(id):
@@ -342,6 +344,14 @@ def edit_vehicle(id):
                         logging.error(f"Error deleting image {img_id}: {e}")
                         return jsonify({"success": False, "message": "Error deleting image."}), 500
 
+            # If new images were uploaded, append their IDs to existing list
+            if 'image_ids' in updated_data and 'image_ids' in vehicle:
+                updated_data['image_ids'] = vehicle['image_ids'] + updated_data['image_ids']
+            elif 'image_ids' in updated_data:
+                updated_data['image_ids'] = updated_data['image_ids']
+            else:
+                updated_data['image_ids'] = vehicle.get('image_ids', [])
+
             # Update the vehicle in MongoDB
             result = collection.update_one({"_id": ObjectId(id)}, {"$set": updated_data})
             if result.modified_count == 1:
@@ -358,20 +368,31 @@ def edit_vehicle(id):
         logging.error(f"Error editing vehicle: {e}")
         return jsonify({"success": False, "message": "Error editing vehicle."}), 500
 
+
 @app.route('/delete/<id>', methods=['POST'])
 def delete_vehicle(id):
     try:
+        # First, fetch the vehicle document to get associated image_ids
+        vehicle = collection.find_one({"_id": ObjectId(id)})
+        if not vehicle:
+            logging.warning(f"Vehicle not found for deletion with ID: {id}")
+            return jsonify({"success": False, "message": "Vehicle not found."}), 404
+
+        # Delete associated images from GridFS
+        if 'image_ids' in vehicle:
+            for img_id in vehicle['image_ids']:
+                try:
+                    fs.delete(ObjectId(img_id))
+                    logging.info(f"Deleted image {img_id} associated with vehicle {id}.")
+                except gridfs.NoFile:
+                    logging.warning(f"Image {img_id} not found in GridFS.")
+                except Exception as e:
+                    logging.error(f"Error deleting image {img_id}: {e}")
+                    return jsonify({"success": False, "message": "Error deleting images."}), 500
+
+        # Delete the vehicle document
         result = collection.delete_one({"_id": ObjectId(id)})
         if result.deleted_count == 1:
-            # Optionally, delete associated images from GridFS
-            vehicle = collection.find_one({"_id": ObjectId(id)})
-            if vehicle and 'image_ids' in vehicle:
-                for img_id in vehicle['image_ids']:
-                    try:
-                        fs.delete(ObjectId(img_id))
-                        logging.info(f"Deleted image {img_id} associated with vehicle {id}.")
-                    except Exception as e:
-                        logging.error(f"Error deleting image {img_id}: {e}")
             logging.info(f"Vehicle with ID {id} deleted successfully.")
             return redirect(url_for('view_fleet'))
         else:

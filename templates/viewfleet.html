@@ -355,8 +355,12 @@
                     class="vehicle-image"
                   >
                 {% else %}
-                  <!-- Placeholder Image or leave empty -->
-                  <i class="bi bi-image" style="font-size: 1.5rem; color: #ccc;"></i>
+                  <!-- Placeholder Image -->
+                  <img 
+                    src="{{ url_for('static', filename='placeholder.jpg') }}" 
+                    alt="No Image Available" 
+                    class="vehicle-image"
+                  >
                 {% endif %}
               </td>
               <!-- End of Image Cell -->
