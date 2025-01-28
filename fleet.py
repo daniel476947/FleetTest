@@ -317,7 +317,7 @@ def edit_vehicle(id):
                 "Location": request.form.get('Location', '').strip()
             }
 
-            # Handle Image Uploads
+            # Handle Image Uploads (New Images)
             if 'images' in request.files:
                 images = request.files.getlist('images')
                 for image in images:
@@ -332,14 +332,21 @@ def edit_vehicle(id):
                         logging.warning(f"Invalid file type for image during edit: {image.filename}")
                         return jsonify({"success": False, "message": f"Invalid file type for image: {image.filename}"}), 400
 
-            # Handle Image Deletions (Optional)
+            # Handle Image Deletions (Existing Images)
             images_to_delete = request.form.getlist('delete_images')  # List of image IDs to delete
             if images_to_delete:
                 for img_id in images_to_delete:
                     try:
                         fs.delete(ObjectId(img_id))
-                        if 'image_ids' in vehicle and img_id in vehicle['image_ids']:
-                            vehicle['image_ids'].remove(img_id)
+                        logging.info(f"Deleted image {img_id} associated with vehicle {id}.")
+                        # Remove img_id from vehicle's image_ids
+                        if 'image_ids' in updated_data:
+                            updated_data['image_ids'].remove(img_id)
+                        else:
+                            updated_data['image_ids'] = [img for img in vehicle.get('image_ids', []) if img != img_id]
+                    except gridfs.NoFile:
+                        logging.warning(f"Image {img_id} not found in GridFS.")
+                        # Optionally, you can decide how to handle missing images
                     except Exception as e:
                         logging.error(f"Error deleting image {img_id}: {e}")
                         return jsonify({"success": False, "message": "Error deleting image."}), 500
