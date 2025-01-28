@@ -126,8 +126,8 @@
     }
 
     .navbar-toggler-icon {
-  filter: invert(1); /* Inverts the icon color */
-}
+      filter: invert(1); /* Inverts the icon color */
+    }
 
   </style>
 </head>
@@ -349,6 +349,10 @@
               <td>{{ vehicle['Location'] }}</td>
               <td>
                 <div class="btn-group" role="group" aria-label="Actions">
+                  <!-- View Button -->
+                  <a href="/view/{{ vehicle['_id'] }}" class="btn btn-sm btn-info w-100 me-2">
+                    <i class="bi bi-eye"></i> View
+                  </a>
                   <!-- Edit Button -->
                   <a href="/edit/{{ vehicle['_id'] }}" class="btn btn-sm btn-primary w-100 me-2">
                     <i class="bi bi-pencil-square"></i> Edit
