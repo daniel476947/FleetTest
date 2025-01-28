@@ -46,6 +46,14 @@
         /* Add padding to the body to prevent content from being hidden behind the navbar */
         body {
           padding-top: 75px; /* Adjust this based on your navbar height */
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh;
+        }
+
+        /* ============ MAIN CONTENT STYLING ============ */
+        .main-content {
+          flex: 1;
         }
 
         /* ============ TABLE STYLING ============ */
@@ -61,7 +69,6 @@
         th {
           background-color: #f4f4f4;
           font-weight: bold;
-          width: 30%;
         }
         tr:nth-child(even) {
           background-color: #f9f9f9;
@@ -77,10 +84,9 @@
           color: white;
           padding: 20px 0;
           text-align: center;
-          position: relative;
-          bottom: 0;
           width: 100%;
-          margin-top: 100px; /* Add margin on top */
+          /* Ensure footer is at the bottom */
+          flex-shrink: 0;
         }
 
         .footer a {
@@ -105,6 +111,56 @@
           .card-header h4 {
             font-size: 1.2rem;
           }
+          th, td {
+            font-size: 0.9rem;
+          }
+          .btn {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.5rem;
+          }
+        }
+
+        /* ============ STICKY COLUMN STYLING ============ */
+        .sticky-column {
+            position: sticky;
+            left: 0;
+            background-color: #fff; /* Fully opaque background */
+            z-index: 10; /* Ensure it stays above other cells */
+            white-space: nowrap; /* Prevent text wrapping */
+            border-right: 1px solid #ddd; /* Right border for separation */
+            box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.1); /* Optional shadow */
+        }
+
+        /* Header cell styling */
+        thead th.sticky-column {
+            background-color: #f4f4f4; /* Match your header background */
+            z-index: 11; /* Higher than body cells */
+            border-right: 1px solid #ddd; /* Right border for consistency */
+        }
+
+        /* Alternating background colors for body cells in the sticky column */
+        tbody tr:nth-child(odd) td.sticky-column {
+            background-color: #ffffff; /* White for odd rows */
+        }
+
+        tbody tr:nth-child(even) td.sticky-column {
+            background-color: #f9f9f9; /* Light grey for even rows */
+        }
+
+        /* ============ BUTTON GROUP STYLING ============ */
+        .btn-group .btn {
+          min-width: 70px;
+        }
+
+        /* ============ LOGO RESPONSIVENESS ============ */
+        .navbar-brand img {
+          height: 40px;
+        }
+
+        @media (max-width: 576px) {
+          .navbar-brand img {
+            height: 30px;
+          }
         }
     </style>
 </head>
@@ -114,8 +170,8 @@
   <nav class="navbar navbar-expand-lg">
     <div class="container-fluid navbar-container"> 
       <!-- Logo on the left -->
-      <a class="navbar-brand" href="#">
-        <img src="/static/logo.jpg" alt="Company Logo" style="height: 40px;">
+      <a class="navbar-brand" href="/">
+        <img src="/static/logo.jpg" alt="Company Logo">
       </a>
 
       <!-- Toggle button for mobile view -->
@@ -145,8 +201,8 @@
     </div>
   </nav>
 
-  <!-- PAGE TITLE & CONTAINER -->
-  <div class="container my-5">
+  <!-- MAIN CONTENT -->
+  <div class="container my-5 main-content">
     <h1 class="text-center mb-4">Vehicle Details</h1>
     <div class="card">
         <div class="card-header bg-primary text-white">
