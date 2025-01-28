@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Vehicle Details</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container my-5">
+        <h2 class="mb-4">Vehicle Details</h2>
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4>{{ vehicle['Registration No'] }}</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Make</th>
+                            <td>{{ vehicle['Make'] }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Model</th>
+                            <td>{{ vehicle['Model'] }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Vehicle Type</th>
+                            <td>{{ vehicle['Vehicle Type'] }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Year</th>
+                            <td>{{ vehicle['Year'] }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Main Colour</th>
+                            <td>{{ vehicle['Main Colour'] }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Secondary Colour</th>
+                            <td>{{ vehicle['Secondary Colour'] or 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Fuel</th>
+                            <td>{{ vehicle['Fuel'] }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Capacity</th>
+                            <td>{{ vehicle['Capacity'] }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Chassis No</th>
+                            <td>{{ vehicle['Chassis No'] }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Model No</th>
+                            <td>{{ vehicle['Model No'] }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Status</th>
+                            <td>{{ vehicle['Status'] }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Location</th>
+                            <td>{{ vehicle['Location'] }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <a href="{{ url_for('view_fleet') }}" class="btn btn-secondary">Back to Fleet</a>
+                <a href="{{ url_for('edit_vehicle', id=vehicle['_id']) }}" class="btn btn-primary">Edit</a>
+                <form action="{{ url_for('delete_vehicle', id=vehicle['_id']) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this vehicle?');">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

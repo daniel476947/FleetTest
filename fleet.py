@@ -155,6 +155,24 @@ def upload():
         logging.error(f"Error inserting data: {e}")
         return jsonify({"success": False, "message": "Error uploading data."}), 500
 
+# ... [existing imports and code]
+
+@app.route('/view/<id>', methods=['GET'])
+def view_vehicle(id):
+    try:
+        # Fetch the vehicle document by its ObjectId
+        vehicle = collection.find_one({"_id": ObjectId(id)})
+        if not vehicle:
+            logging.warning(f"Vehicle not found with ID: {id}")
+            return jsonify({"success": False, "message": "Vehicle not found."}), 404
+
+        # Convert ObjectId to string for rendering
+        vehicle['_id'] = str(vehicle['_id'])
+
+        return render_template('view_vehicle.html', vehicle=vehicle)
+    except Exception as e:
+        logging.error(f"Error viewing vehicle: {e}")
+        return jsonify({"success": False, "message": "Error viewing vehicle."}), 500
 
 
 @app.route('/export_fleet', methods=['GET'])
