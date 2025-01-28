@@ -39,8 +39,8 @@
       }
 
       .navbar-toggler-icon {
-  filter: invert(1); /* Inverts the icon color */
-}
+          filter: invert(1); /* Inverts the icon color */
+      }
 
     </style>
 
@@ -73,7 +73,8 @@
     <div class="container mt-5">
         <h1 class="text-center mb-4">Fleet Management Form</h1>
         
-        <form id="fleetForm" class="shadow p-4 rounded bg-light">
+        <!-- Updated Form Tag with enctype for File Uploads -->
+        <form id="fleetForm" class="shadow p-4 rounded bg-light" enctype="multipart/form-data">
             <div class="mb-3">
               <label for="registration_no" class="form-label">Registration No:</label>
               <input 
@@ -86,7 +87,6 @@
               >
             </div>
           
-        
 
             <div class="mb-3">
                 <label for="make" class="form-label">Make:</label>
@@ -233,6 +233,21 @@
                     <option value="Eccles">Eccles</option>
                 </select>
             </div>
+
+            <!-- **Added Image Upload Field** -->
+            <div class="mb-3">
+                <label for="images" class="form-label">Upload Images:</label>
+                <input 
+                  class="form-control" 
+                  type="file" 
+                  id="images" 
+                  name="images" 
+                  multiple 
+                  accept="image/*"
+                >
+                <div class="form-text">You can upload multiple images. Accepted formats: jpg, jpeg, png, gif.</div>
+            </div>
+            <!-- **End of Image Upload Field** -->
 
             <div class="d-flex justify-content-between">
                 <button type="button" class="btn btn-primary" onclick="submitForm()">Submit</button>
@@ -394,7 +409,7 @@
           submitForm();
       });
   </script>
-  
-  
+
+
 </body>
 </html>

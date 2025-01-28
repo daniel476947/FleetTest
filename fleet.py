@@ -9,6 +9,8 @@ import os
 import re
 import tempfile
 import logging
+import gridfs  # Import GridFS
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 CORS(app)
@@ -30,6 +32,9 @@ client = MongoClient(MONGO_URI)
 # Specify the database and collection
 db = client['Fleettest']
 collection = db['Fleet']
+
+# Initialize GridFS
+fs = gridfs.GridFS(db)
 
 REG_NO_PATTERN = r'^[A-Z]{3} [0-9]{1,4}$'  # 3 uppercase letters, space, 1-4 digits
 
@@ -76,6 +81,11 @@ def build_query(form_data):
         query["Registration No"] = {"$in": [None, ""]}
     
     return query
+
+def allowed_file(filename):
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif'}
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 @app.route('/', methods=['GET', 'POST'])
 def view_fleet():
@@ -139,8 +149,22 @@ def upload():
             "Chassis No": request.form.get('Chassis No', '').strip(),
             "Model No": request.form.get('Model No', '').strip(),
             "Status": request.form.get('Status', '').strip(),
-            "Location": request.form.get('Location', '').strip()
+            "Location": request.form.get('Location', '').strip(),
+            "image_ids": []  # Initialize empty list for image IDs
         }
+
+        # Handle Image Uploads
+        if 'images' in request.files:
+            images = request.files.getlist('images')
+            for image in images:
+                if image and allowed_file(image.filename):
+                    filename = secure_filename(image.filename)
+                    # Save image to GridFS
+                    image_id = fs.put(image.read(), filename=filename, content_type=image.content_type)
+                    vehicle_data['image_ids'].append(str(image_id))
+                else:
+                    logging.warning(f"Invalid file type for image: {image.filename}")
+                    return jsonify({"success": False, "message": f"Invalid file type for image: {image.filename}"}), 400
 
         # 4. Insert into MongoDB
         result = collection.insert_one(vehicle_data)
@@ -250,6 +274,7 @@ def edit_vehicle(id):
             if secondary_colour.lower() == 'none':
                 secondary_colour = ""
 
+            # Build updated_data dictionary
             updated_data = {
                 "Registration No": reg_no,
                 "Make": request.form.get('Make', '').strip(),
@@ -266,11 +291,40 @@ def edit_vehicle(id):
                 "Location": request.form.get('Location', '').strip()
             }
 
+            # Handle Image Uploads
+            if 'images' in request.files:
+                images = request.files.getlist('images')
+                for image in images:
+                    if image and allowed_file(image.filename):
+                        filename = secure_filename(image.filename)
+                        # Save image to GridFS
+                        image_id = fs.put(image.read(), filename=filename, content_type=image.content_type)
+                        if 'image_ids' not in updated_data:
+                            updated_data['image_ids'] = []
+                        updated_data['image_ids'].append(str(image_id))
+                    else:
+                        logging.warning(f"Invalid file type for image during edit: {image.filename}")
+                        return jsonify({"success": False, "message": f"Invalid file type for image: {image.filename}"}), 400
+
+            # Handle Image Deletions (Optional)
+            images_to_delete = request.form.getlist('delete_images')  # List of image IDs to delete
+            if images_to_delete:
+                for img_id in images_to_delete:
+                    try:
+                        fs.delete(ObjectId(img_id))
+                        if 'image_ids' in vehicle and img_id in vehicle['image_ids']:
+                            vehicle['image_ids'].remove(img_id)
+                    except Exception as e:
+                        logging.error(f"Error deleting image {img_id}: {e}")
+                        return jsonify({"success": False, "message": "Error deleting image."}), 500
+
+            # Update the vehicle in MongoDB
             result = collection.update_one({"_id": ObjectId(id)}, {"$set": updated_data})
             if result.modified_count == 1:
                 logging.info(f"Vehicle with ID {id} updated successfully.")
             else:
                 logging.info(f"No changes made to vehicle with ID {id}.")
+
             return redirect(url_for('view_fleet'))
 
     except ValueError:
@@ -285,6 +339,15 @@ def delete_vehicle(id):
     try:
         result = collection.delete_one({"_id": ObjectId(id)})
         if result.deleted_count == 1:
+            # Optionally, delete associated images from GridFS
+            vehicle = collection.find_one({"_id": ObjectId(id)})
+            if vehicle and 'image_ids' in vehicle:
+                for img_id in vehicle['image_ids']:
+                    try:
+                        fs.delete(ObjectId(img_id))
+                        logging.info(f"Deleted image {img_id} associated with vehicle {id}.")
+                    except Exception as e:
+                        logging.error(f"Error deleting image {img_id}: {e}")
             logging.info(f"Vehicle with ID {id} deleted successfully.")
             return redirect(url_for('view_fleet'))
         else:
@@ -294,9 +357,23 @@ def delete_vehicle(id):
         logging.error(f"Error deleting vehicle: {e}")
         return jsonify({"success": False, "message": "Error deleting vehicle."}), 500    
 
+
 @app.route('/form')
 def index():
     return render_template('form.html')  # Renders the HTML form
+
+@app.route('/image/<image_id>')
+def get_image(image_id):
+    try:
+        image = fs.get(ObjectId(image_id))
+        return send_file(
+            image,
+            attachment_filename=image.filename,
+            mimetype=image.content_type
+        )
+    except Exception as e:
+        logging.error(f"Error retrieving image {image_id}: {e}")
+        return jsonify({"success": False, "message": "Image not found."}), 404
 
 if __name__ == '__main__':
     app.run(debug=True)  # Consider setting debug=False in production

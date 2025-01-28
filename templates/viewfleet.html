@@ -58,6 +58,7 @@
       border: 1px solid #ddd;
       padding: 8px;
       text-align: center;
+      vertical-align: middle; /* Vertically center the content */
     }
     th {
       background-color: #f4f4f4;
@@ -129,6 +130,13 @@
       filter: invert(1); /* Inverts the icon color */
     }
 
+    /* ============ IMAGE COLUMN STYLING ============ */
+    .vehicle-image {
+      width: 100px;
+      height: 75px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
@@ -314,6 +322,9 @@
         <thead>
           <tr>
             <th class="sticky-column">No.</th>
+            <!-- **Added Image Column Header** -->
+            <th>Image</th>
+            <!-- **End of Image Column Header** -->
             <th>Registration No</th>
             <th>Make</th>
             <th>Model</th>
@@ -334,6 +345,21 @@
           {% for vehicle in vehicles %}
             <tr>
               <td class="sticky-column">{{ loop.index }}</td>
+              <!-- **Added Image Cell** -->
+              <td>
+                {% if vehicle.get('image_ids') and vehicle['image_ids']|length > 0 %}
+                  <!-- Display the first image -->
+                  <img 
+                    src="{{ url_for('get_image', image_id=vehicle['image_ids'][0]) }}" 
+                    alt="Vehicle Image" 
+                    class="vehicle-image"
+                  >
+                {% else %}
+                  <!-- Placeholder Image or leave empty -->
+                  <i class="bi bi-image" style="font-size: 1.5rem; color: #ccc;"></i>
+                {% endif %}
+              </td>
+              <!-- **End of Image Cell** -->
               <td>{{ vehicle['Registration No'] }}</td>
               <td>{{ vehicle['Make'] }}</td>
               <td>{{ vehicle['Model'] }}</td>
