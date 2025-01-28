@@ -198,6 +198,30 @@ def view_vehicle(id):
         logging.error(f"Error viewing vehicle: {e}")
         return jsonify({"success": False, "message": "Error viewing vehicle."}), 500
 
+@app.route('/image/<image_id>')
+def get_image(image_id):
+    try:
+        # Validate and convert the image_id to ObjectId
+        obj_id = ObjectId(image_id)
+    except Exception as e:
+        app.logger.error(f"Invalid image_id format: {image_id} - {e}")
+        return jsonify({"success": False, "message": "Invalid image ID."}), 400
+
+    try:
+        # Retrieve the image from GridFS
+        image = fs.get(obj_id)
+        return send_file(
+            image,
+            mimetype=image.content_type,
+            as_attachment=False,
+            attachment_filename=image.filename
+        )
+    except gridfs.NoFile:
+        app.logger.error(f"No file found with image_id: {image_id}")
+        return jsonify({"success": False, "message": "Image not found."}), 404
+    except Exception as e:
+        app.logger.error(f"Error retrieving image {image_id}: {e}")
+        return jsonify({"success": False, "message": "Error retrieving image."}), 500
 
 @app.route('/export_fleet', methods=['GET'])
 def export_fleet():
@@ -362,18 +386,6 @@ def delete_vehicle(id):
 def index():
     return render_template('form.html')  # Renders the HTML form
 
-@app.route('/image/<image_id>')
-def get_image(image_id):
-    try:
-        image = fs.get(ObjectId(image_id))
-        return send_file(
-            image,
-            attachment_filename=image.filename,
-            mimetype=image.content_type
-        )
-    except Exception as e:
-        logging.error(f"Error retrieving image {image_id}: {e}")
-        return jsonify({"success": False, "message": "Image not found."}), 404
 
 if __name__ == '__main__':
     app.run(debug=True)  # Consider setting debug=False in production
