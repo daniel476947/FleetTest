@@ -129,11 +129,17 @@ def view_fleet():
             'pages': list(range(1, total_pages + 1))
         }
         
-        return render_template('viewfleet.html', vehicles=vehicles, pagination=pagination, form_data=form_data)
+        # Pass total_documents as total_records to the template
+        return render_template('viewfleet.html', 
+                               vehicles=vehicles, 
+                               pagination=pagination, 
+                               form_data=form_data, 
+                               total_records=total_documents)
     
     except Exception as e:
         logging.error(f"Error fetching data: {e}")
         return jsonify({"success": False, "message": "Error fetching data."}), 500
+
 
 
 
