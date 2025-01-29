@@ -309,8 +309,11 @@
             {% if vehicle.get('image_ids') and vehicle['image_ids']|length > 0 %}
                 <div class="row">
                     {% for image_id in vehicle['image_ids'] %}
+                        {% set thumbnail_id = vehicle['thumbnail_ids'][loop.index0] %}
                         <div class="col-md-3 col-sm-4 col-6 text-center mb-3">
-                            <img src="{{ url_for('get_image', image_id=image_id) }}" alt="Vehicle Image" class="vehicle-image">
+                            <a href="{{ url_for('get_image', image_id=image_id) }}" target="_blank">
+                                <img src="{{ url_for('get_thumbnail', image_id=thumbnail_id) }}" alt="Vehicle Image" class="vehicle-image">
+                            </a>
                             <div class="form-check mt-2">
                                 <input class="form-check-input" type="checkbox" value="{{ image_id }}" id="deleteImage{{ loop.index }}" name="delete_images">
                                 <label class="form-check-label" for="deleteImage{{ loop.index }}">
