@@ -137,6 +137,11 @@
       object-fit: cover;
       border-radius: 5px;
     }
+
+    /* ============ PAGINATION STYLING ============ */
+    .pagination {
+      justify-content: center;
+    }
   </style>
 </head>
 <body>
@@ -191,6 +196,7 @@
               name="search" 
               class="form-control" 
               placeholder="Search by Registration No, Make, Model or Chassis No"
+              value="{{ form_data.get('search', '') }}"
             >
           </div>
 
@@ -198,8 +204,8 @@
           <div class="col-6 col-md-3 col-lg-2">
             <select name="registration_status" class="form-select">
               <option value="">Registration Status</option>
-              <option value="Registered">Registered</option>
-              <option value="Unregistered">Unregistered</option>
+              <option value="Registered" {% if form_data.get('registration_status') == 'Registered' %}selected{% endif %}>Registered</option>
+              <option value="Unregistered" {% if form_data.get('registration_status') == 'Unregistered' %}selected{% endif %}>Unregistered</option>
             </select>
           </div>
 
@@ -207,22 +213,22 @@
           <div class="col-6 col-md-3 col-lg-2">
             <select name="vehicle_type" class="form-select">
               <option value="">Vehicle Type</option>
-              <option value="Sedan">Sedan</option>
-              <option value="Hatchback">Hatchback</option>
-              <option value="SUV">SUV</option>
-              <option value="Mini Van">Mini Van</option>
-              <option value="Van">Van</option>
-              <option value="Truck">Truck</option>
-              <option value="Wagon">Wagon</option>
-              <option value="Coupe">Coupe</option>
-              <option value="Mini Bus">Mini Bus</option>
-              <option value="Medium Bus">Medium Bus</option>
-              <option value="Large Bus">Large Bus</option>
-              <option value="Pick up">Pick up</option>
-              <option value="Convertible">Convertible</option>
-              <option value="Tractor">Tractor</option>
-              <option value="Forklift">Forklift</option>
-              <option value="Machinery">Machinery</option>
+              <option value="Sedan" {% if form_data.get('vehicle_type') == 'Sedan' %}selected{% endif %}>Sedan</option>
+              <option value="Hatchback" {% if form_data.get('vehicle_type') == 'Hatchback' %}selected{% endif %}>Hatchback</option>
+              <option value="SUV" {% if form_data.get('vehicle_type') == 'SUV' %}selected{% endif %}>SUV</option>
+              <option value="Mini Van" {% if form_data.get('vehicle_type') == 'Mini Van' %}selected{% endif %}>Mini Van</option>
+              <option value="Van" {% if form_data.get('vehicle_type') == 'Van' %}selected{% endif %}>Van</option>
+              <option value="Truck" {% if form_data.get('vehicle_type') == 'Truck' %}selected{% endif %}>Truck</option>
+              <option value="Wagon" {% if form_data.get('vehicle_type') == 'Wagon' %}selected{% endif %}>Wagon</option>
+              <option value="Coupe" {% if form_data.get('vehicle_type') == 'Coupe' %}selected{% endif %}>Coupe</option>
+              <option value="Mini Bus" {% if form_data.get('vehicle_type') == 'Mini Bus' %}selected{% endif %}>Mini Bus</option>
+              <option value="Medium Bus" {% if form_data.get('vehicle_type') == 'Medium Bus' %}selected{% endif %}>Medium Bus</option>
+              <option value="Large Bus" {% if form_data.get('vehicle_type') == 'Large Bus' %}selected{% endif %}>Large Bus</option>
+              <option value="Pick up" {% if form_data.get('vehicle_type') == 'Pick up' %}selected{% endif %}>Pick up</option>
+              <option value="Convertible" {% if form_data.get('vehicle_type') == 'Convertible' %}selected{% endif %}>Convertible</option>
+              <option value="Tractor" {% if form_data.get('vehicle_type') == 'Tractor' %}selected{% endif %}>Tractor</option>
+              <option value="Forklift" {% if form_data.get('vehicle_type') == 'Forklift' %}selected{% endif %}>Forklift</option>
+              <option value="Machinery" {% if form_data.get('vehicle_type') == 'Machinery' %}selected{% endif %}>Machinery</option>
             </select>
           </div>
 
@@ -230,24 +236,24 @@
           <div class="col-6 col-md-3 col-lg-2">
             <select name="main_colour" class="form-select">
               <option value="">Main Colour</option>
-              <option value="Beige">Beige</option>
-              <option value="Black">Black</option>
-              <option value="Blue">Blue</option>
-              <option value="Brown">Brown</option>
-              <option value="Burgundy">Burgundy</option>
-              <option value="Gold">Gold</option>
-              <option value="Gray">Gray</option>
-              <option value="Green">Green</option>
-              <option value="Orange">Orange</option>
-              <option value="Pink">Pink</option>
-              <option value="Purple">Purple</option>
-              <option value="Red">Red</option>
-              <option value="Silver">Silver</option>
-              <option value="Teal">Teal</option>
-              <option value="Turquoise">Turquoise</option>
-              <option value="White">White</option>
-              <option value="Wine Red">Wine Red</option>
-              <option value="Yellow">Yellow</option>
+              <option value="Beige" {% if form_data.get('main_colour') == 'Beige' %}selected{% endif %}>Beige</option>
+              <option value="Black" {% if form_data.get('main_colour') == 'Black' %}selected{% endif %}>Black</option>
+              <option value="Blue" {% if form_data.get('main_colour') == 'Blue' %}selected{% endif %}>Blue</option>
+              <option value="Brown" {% if form_data.get('main_colour') == 'Brown' %}selected{% endif %}>Brown</option>
+              <option value="Burgundy" {% if form_data.get('main_colour') == 'Burgundy' %}selected{% endif %}>Burgundy</option>
+              <option value="Gold" {% if form_data.get('main_colour') == 'Gold' %}selected{% endif %}>Gold</option>
+              <option value="Gray" {% if form_data.get('main_colour') == 'Gray' %}selected{% endif %}>Gray</option>
+              <option value="Green" {% if form_data.get('main_colour') == 'Green' %}selected{% endif %}>Green</option>
+              <option value="Orange" {% if form_data.get('main_colour') == 'Orange' %}selected{% endif %}>Orange</option>
+              <option value="Pink" {% if form_data.get('main_colour') == 'Pink' %}selected{% endif %}>Pink</option>
+              <option value="Purple" {% if form_data.get('main_colour') == 'Purple' %}selected{% endif %}>Purple</option>
+              <option value="Red" {% if form_data.get('main_colour') == 'Red' %}selected{% endif %}>Red</option>
+              <option value="Silver" {% if form_data.get('main_colour') == 'Silver' %}selected{% endif %}>Silver</option>
+              <option value="Teal" {% if form_data.get('main_colour') == 'Teal' %}selected{% endif %}>Teal</option>
+              <option value="Turquoise" {% if form_data.get('main_colour') == 'Turquoise' %}selected{% endif %}>Turquoise</option>
+              <option value="White" {% if form_data.get('main_colour') == 'White' %}selected{% endif %}>White</option>
+              <option value="Wine Red" {% if form_data.get('main_colour') == 'Wine Red' %}selected{% endif %}>Wine Red</option>
+              <option value="Yellow" {% if form_data.get('main_colour') == 'Yellow' %}selected{% endif %}>Yellow</option>
             </select>
           </div>
 
@@ -255,24 +261,24 @@
           <div class="col-6 col-md-3 col-lg-2">
             <select name="secondary_colour" class="form-select">
               <option value="">Secondary Colour</option>
-              <option value="Beige">Beige</option>
-              <option value="Black">Black</option>
-              <option value="Blue">Blue</option>
-              <option value="Brown">Brown</option>
-              <option value="Burgundy">Burgundy</option>
-              <option value="Gold">Gold</option>
-              <option value="Gray">Gray</option>
-              <option value="Green">Green</option>
-              <option value="Orange">Orange</option>
-              <option value="Pink">Pink</option>
-              <option value="Purple">Purple</option>
-              <option value="Red">Red</option>
-              <option value="Silver">Silver</option>
-              <option value="Teal">Teal</option>
-              <option value="Turquoise">Turquoise</option>
-              <option value="White">White</option>
-              <option value="Wine Red">Wine Red</option>
-              <option value="Yellow">Yellow</option>
+              <option value="Beige" {% if form_data.get('secondary_colour') == 'Beige' %}selected{% endif %}>Beige</option>
+              <option value="Black" {% if form_data.get('secondary_colour') == 'Black' %}selected{% endif %}>Black</option>
+              <option value="Blue" {% if form_data.get('secondary_colour') == 'Blue' %}selected{% endif %}>Blue</option>
+              <option value="Brown" {% if form_data.get('secondary_colour') == 'Brown' %}selected{% endif %}>Brown</option>
+              <option value="Burgundy" {% if form_data.get('secondary_colour') == 'Burgundy' %}selected{% endif %}>Burgundy</option>
+              <option value="Gold" {% if form_data.get('secondary_colour') == 'Gold' %}selected{% endif %}>Gold</option>
+              <option value="Gray" {% if form_data.get('secondary_colour') == 'Gray' %}selected{% endif %}>Gray</option>
+              <option value="Green" {% if form_data.get('secondary_colour') == 'Green' %}selected{% endif %}>Green</option>
+              <option value="Orange" {% if form_data.get('secondary_colour') == 'Orange' %}selected{% endif %}>Orange</option>
+              <option value="Pink" {% if form_data.get('secondary_colour') == 'Pink' %}selected{% endif %}>Pink</option>
+              <option value="Purple" {% if form_data.get('secondary_colour') == 'Purple' %}selected{% endif %}>Purple</option>
+              <option value="Red" {% if form_data.get('secondary_colour') == 'Red' %}selected{% endif %}>Red</option>
+              <option value="Silver" {% if form_data.get('secondary_colour') == 'Silver' %}selected{% endif %}>Silver</option>
+              <option value="Teal" {% if form_data.get('secondary_colour') == 'Teal' %}selected{% endif %}>Teal</option>
+              <option value="Turquoise" {% if form_data.get('secondary_colour') == 'Turquoise' %}selected{% endif %}>Turquoise</option>
+              <option value="White" {% if form_data.get('secondary_colour') == 'White' %}selected{% endif %}>White</option>
+              <option value="Wine Red" {% if form_data.get('secondary_colour') == 'Wine Red' %}selected{% endif %}>Wine Red</option>
+              <option value="Yellow" {% if form_data.get('secondary_colour') == 'Yellow' %}selected{% endif %}>Yellow</option>
             </select>
           </div>
 
@@ -280,8 +286,8 @@
           <div class="col-6 col-md-3 col-lg-2">
             <select name="fuel" class="form-select">
               <option value="">Fuel</option>
-              <option value="Gas">Gas</option>
-              <option value="Diesel">Diesel</option>
+              <option value="Gas" {% if form_data.get('fuel') == 'Gas' %}selected{% endif %}>Gas</option>
+              <option value="Diesel" {% if form_data.get('fuel') == 'Diesel' %}selected{% endif %}>Diesel</option>
             </select>
           </div>
 
@@ -289,9 +295,9 @@
           <div class="col-6 col-md-3 col-lg-2">
             <select name="status" class="form-select">
               <option value="">Status</option>
-              <option value="Active">Active</option>
-              <option value="Parked">Parked</option>
-              <option value="Out of Order">Out of Order</option>
+              <option value="Active" {% if form_data.get('status') == 'Active' %}selected{% endif %}>Active</option>
+              <option value="Parked" {% if form_data.get('status') == 'Parked' %}selected{% endif %}>Parked</option>
+              <option value="Out of Order" {% if form_data.get('status') == 'Out of Order' %}selected{% endif %}>Out of Order</option>
             </select>
           </div>
 
@@ -299,8 +305,8 @@
           <div class="col-6 col-md-3 col-lg-2">
             <select name="location" class="form-select">
               <option value="">Location</option>
-              <option value="Prashad Nagar">Prashad Nagar</option>
-              <option value="Eccles">Eccles</option>
+              <option value="Prashad Nagar" {% if form_data.get('location') == 'Prashad Nagar' %}selected{% endif %}>Prashad Nagar</option>
+              <option value="Eccles" {% if form_data.get('location') == 'Eccles' %}selected{% endif %}>Eccles</option>
             </select>
           </div>
 
@@ -312,6 +318,7 @@
       </form>
     </div>
     
+    <!-- Records Found -->
     <div class="text-end mb-2">
       <strong>{{ vehicles|length }} records found</strong>
     </div>
@@ -344,7 +351,7 @@
         <tbody>
           {% for vehicle in vehicles %}
             <tr>
-              <td class="sticky-column">{{ loop.index }}</td>
+              <td class="sticky-column">{{ ((pagination.current_page - 1) * 10) + loop.index }}</td>
               <!-- Added Image Cell -->
               <td>
                 {% if vehicle.get('image_ids') and vehicle['image_ids']|length > 0 %}
@@ -409,17 +416,88 @@
       </table>
     </div>
 
+    <!-- Pagination Controls -->
+    {% if pagination.total_pages > 1 %}
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          <!-- Previous Button -->
+          <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+            <a 
+              class="page-link" 
+              href="{{ url_for('view_fleet', 
+                                page=pagination.prev_page,
+                                search=form_data.get('search', ''),
+                                registration_status=form_data.get('registration_status', ''),
+                                vehicle_type=form_data.get('vehicle_type', ''),
+                                main_colour=form_data.get('main_colour', ''),
+                                secondary_colour=form_data.get('secondary_colour', ''),
+                                fuel=form_data.get('fuel', ''),
+                                status=form_data.get('status', ''),
+                                location=form_data.get('location', '')
+                              ) }}" 
+              aria-label="Previous"
+            >
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+
+          <!-- Page Numbers -->
+          {% for p in pagination.pages %}
+            <li class="page-item {% if p == pagination.current_page %}active{% endif %}">
+              <a 
+                class="page-link" 
+                href="{{ url_for('view_fleet', 
+                                  page=p,
+                                  search=form_data.get('search', ''),
+                                  registration_status=form_data.get('registration_status', ''),
+                                  vehicle_type=form_data.get('vehicle_type', ''),
+                                  main_colour=form_data.get('main_colour', ''),
+                                  secondary_colour=form_data.get('secondary_colour', ''),
+                                  fuel=form_data.get('fuel', ''),
+                                  status=form_data.get('status', ''),
+                                  location=form_data.get('location', '')
+                                ) }}"
+              >
+                {{ p }}
+              </a>
+            </li>
+          {% endfor %}
+
+          <!-- Next Button -->
+          <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+            <a 
+              class="page-link" 
+              href="{{ url_for('view_fleet', 
+                                page=pagination.next_page,
+                                search=form_data.get('search', ''),
+                                registration_status=form_data.get('registration_status', ''),
+                                vehicle_type=form_data.get('vehicle_type', ''),
+                                main_colour=form_data.get('main_colour', ''),
+                                secondary_colour=form_data.get('secondary_colour', ''),
+                                fuel=form_data.get('fuel', ''),
+                                status=form_data.get('status', ''),
+                                location=form_data.get('location', '')
+                              ) }}" 
+              aria-label="Next"
+            >
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    {% endif %}
+
     <div class="text-center mt-4">
       <a 
         href="{{ url_for('export_fleet', 
-                search=request.form.get('search', ''), 
-                vehicle_type=request.form.get('vehicle_type', ''),
-                main_colour=request.form.get('main_colour', ''), 
-                secondary_colour=request.form.get('secondary_colour', ''),
-                fuel=request.form.get('fuel', ''), 
-                status=request.form.get('status', ''), 
-                location=request.form.get('location', ''),
-                registration_status=request.form.get('registration_status', '')  
+                search=form_data.get('search', ''), 
+                vehicle_type=form_data.get('vehicle_type', ''),
+                main_colour=form_data.get('main_colour', ''), 
+                secondary_colour=form_data.get('secondary_colour', ''),
+                fuel=form_data.get('fuel', ''), 
+                status=form_data.get('status', ''), 
+                location=form_data.get('location', ''),
+                registration_status=form_data.get('registration_status', '')  
             ) }}"
         class="btn btn-success"
       >

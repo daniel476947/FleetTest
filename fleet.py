@@ -92,14 +92,51 @@ def view_fleet():
     try:
         if request.method == 'POST':
             form_data = request.form
+            # For POST requests, reset to the first page
+            page = 1
         else:
             form_data = request.args  # To handle GET requests if needed
-
+            # Get the current page from query parameters, default to 1
+            page = int(request.args.get('page', 1))
+        
+        # Number of records per page
+        PER_PAGE = 10
+        
+        # Build the query based on form data
         query = build_query(form_data if request.method == 'POST' else {})
-        vehicles = list(collection.find(query))
+        
+        # Count total matching documents
+        total_documents = collection.count_documents(query)
+        
+        # Calculate total pages
+        total_pages = (total_documents + PER_PAGE - 1) // PER_PAGE  # Ceiling division
+        
+        # Ensure the current page is within valid range
+        if page < 1:
+            page = 1
+        elif page > total_pages and total_pages != 0:
+            page = total_pages
+        
+        # Fetch the documents for the current page
+        vehicles_cursor = collection.find(query).skip((page - 1) * PER_PAGE).limit(PER_PAGE)
+        vehicles = list(vehicles_cursor)
+        
         for vehicle in vehicles:
             vehicle['_id'] = str(vehicle['_id'])  # Convert ObjectId to string for rendering
-        return render_template('viewfleet.html', vehicles=vehicles)  # Render HTML template
+        
+        # Prepare pagination data
+        pagination = {
+            'total_pages': total_pages,
+            'current_page': page,
+            'has_prev': page > 1,
+            'has_next': page < total_pages,
+            'prev_page': page - 1,
+            'next_page': page + 1,
+            'pages': list(range(1, total_pages + 1))
+        }
+        
+        return render_template('viewfleet.html', vehicles=vehicles, pagination=pagination, form_data=form_data)
+    
     except Exception as e:
         logging.error(f"Error fetching data: {e}")
         return jsonify({"success": False, "message": "Error fetching data."}), 500
@@ -384,7 +421,6 @@ def edit_vehicle(id):
         return render_template('editvehicle.html', vehicle=vehicle, error_message=error_message), 500
 
 
-
 @app.route('/delete/<id>', methods=['POST'])
 def delete_vehicle(id):
     try:
@@ -425,4 +461,4 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)  # Consider setting debug=False in productio
+    app.run(debug=True)  # Consider setting debug=False in production
