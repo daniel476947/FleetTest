@@ -11,6 +11,8 @@ import tempfile
 import logging
 import gridfs  # Import GridFS
 from werkzeug.utils import secure_filename
+from PIL import Image
+import io
 
 app = Flask(__name__)
 CORS(app)
@@ -140,9 +142,6 @@ def view_fleet():
         logging.error(f"Error fetching data: {e}")
         return jsonify({"success": False, "message": "Error fetching data."}), 500
 
-
-
-
 @app.route('/upload', methods=['POST'])
 def upload():
     try:
@@ -188,7 +187,8 @@ def upload():
             "Model No": request.form.get('Model No', '').strip(),
             "Status": request.form.get('Status', '').strip(),
             "Location": request.form.get('Location', '').strip(),
-            "image_ids": []  # Initialize empty list for image IDs
+            "image_ids": [],  # Initialize empty list for original image IDs
+            "thumbnail_ids": []  # Initialize empty list for thumbnail image IDs
         }
 
         # Handle Image Uploads
@@ -198,9 +198,26 @@ def upload():
                 # Only process files with a non-empty filename
                 if image and image.filename and allowed_file(image.filename):
                     filename = secure_filename(image.filename)
-                    # Save image to GridFS
-                    image_id = fs.put(image.read(), filename=filename, content_type=image.content_type)
-                    vehicle_data['image_ids'].append(str(image_id))
+                    
+                    # Save original image to GridFS
+                    original_image_id = fs.put(image.read(), filename=filename, content_type=image.content_type)
+                    vehicle_data['image_ids'].append(str(original_image_id))
+                    
+                    # Reset the file pointer and read image again for thumbnail
+                    image.seek(0)
+                    img = Image.open(image)
+                    
+                    # Define thumbnail size (e.g., 200x150 pixels)
+                    img.thumbnail((200, 150))
+                    
+                    # Save thumbnail to a bytes buffer
+                    thumb_io = io.BytesIO()
+                    img.save(thumb_io, format=img.format)
+                    thumb_io.seek(0)
+                    
+                    # Save thumbnail image to GridFS
+                    thumbnail_image_id = fs.put(thumb_io.read(), filename=f"thumb_{filename}", content_type=image.content_type)
+                    vehicle_data['thumbnail_ids'].append(str(thumbnail_image_id))
                 elif image and image.filename:
                     # Invalid file type
                     logging.warning(f"Invalid file type for image: {image.filename}")
@@ -220,7 +237,6 @@ def upload():
         logging.error(f"Error inserting data: {e}")
         return jsonify({"success": False, "message": "Error uploading data."}), 500
 
-
 @app.route('/view/<id>', methods=['GET'])
 def view_vehicle(id):
     try:
@@ -237,7 +253,6 @@ def view_vehicle(id):
     except Exception as e:
         logging.error(f"Error viewing vehicle: {e}")
         return jsonify({"success": False, "message": "Error viewing vehicle."}), 500
-
 
 @app.route('/image/<image_id>')
 def get_image(image_id):
@@ -264,6 +279,29 @@ def get_image(image_id):
         app.logger.error(f"Error retrieving image {image_id}: {e}")
         return jsonify({"success": False, "message": "Error retrieving image."}), 500
 
+@app.route('/thumbnail/<image_id>')
+def get_thumbnail(image_id):
+    try:
+        obj_id = ObjectId(image_id)
+    except Exception as e:
+        app.logger.error(f"Invalid thumbnail image_id format: {image_id} - {e}")
+        return jsonify({"success": False, "message": "Invalid thumbnail image ID."}), 400
+
+    try:
+        # Retrieve the thumbnail from GridFS
+        thumbnail = fs.get(obj_id)
+        return send_file(
+            thumbnail,
+            mimetype=thumbnail.content_type,
+            as_attachment=False,
+            download_name=thumbnail.filename  # Updated to 'download_name' for Flask 2.0+
+        )
+    except gridfs.NoFile:
+        app.logger.error(f"No thumbnail found with image_id: {image_id}")
+        return jsonify({"success": False, "message": "Thumbnail not found."}), 404
+    except Exception as e:
+        app.logger.error(f"Error retrieving thumbnail {image_id}: {e}")
+        return jsonify({"success": False, "message": "Error retrieving thumbnail."}), 500
 
 @app.route('/export_fleet', methods=['GET'])
 def export_fleet():
@@ -300,7 +338,6 @@ def export_fleet():
     except Exception as e:
         logging.error(f"Error exporting data: {e}")
         return jsonify({"success": False, "message": "Error exporting data."}), 500
-
 
 @app.route('/edit/<id>', methods=['GET', 'POST'])
 def edit_vehicle(id):
@@ -342,19 +379,31 @@ def edit_vehicle(id):
             if secondary_colour.lower() == 'none':
                 secondary_colour = ""
 
-            # Start with existing image_ids
+            # Start with existing image_ids and thumbnail_ids
             updated_image_ids = vehicle.get('image_ids', [])
+            updated_thumbnail_ids = vehicle.get('thumbnail_ids', [])
 
             # Handle Image Deletions (Existing Images)
             images_to_delete = request.form.getlist('delete_images')  # List of image IDs to delete
             if images_to_delete:
                 for img_id in images_to_delete:
                     try:
-                        fs.delete(ObjectId(img_id))
-                        logging.info(f"Deleted image {img_id} associated with vehicle {id}.")
-                        # Remove img_id from updated_image_ids
+                        # Find the index of the original image to delete
                         if img_id in updated_image_ids:
-                            updated_image_ids.remove(img_id)
+                            index = updated_image_ids.index(img_id)
+                            # Corresponding thumbnail_id
+                            if index < len(updated_thumbnail_ids):
+                                thumbnail_id = updated_thumbnail_ids[index]
+                                # Delete thumbnail
+                                fs.delete(ObjectId(thumbnail_id))
+                                logging.info(f"Deleted thumbnail {thumbnail_id} associated with vehicle {id}.")
+                                # Remove thumbnail_id
+                                updated_thumbnail_ids.pop(index)
+                            # Delete original image
+                            fs.delete(ObjectId(img_id))
+                            logging.info(f"Deleted image {img_id} associated with vehicle {id}.")
+                            # Remove image_id
+                            updated_image_ids.pop(index)
                     except gridfs.NoFile:
                         logging.warning(f"Image {img_id} not found in GridFS.")
                         error_message = f"Image with ID {img_id} not found."
@@ -372,9 +421,26 @@ def edit_vehicle(id):
                 for image in images:
                     if image and image.filename and allowed_file(image.filename):
                         filename = secure_filename(image.filename)
-                        # Save image to GridFS
-                        image_id = fs.put(image.read(), filename=filename, content_type=image.content_type)
-                        updated_image_ids.append(str(image_id))
+                        
+                        # Save original image to GridFS
+                        original_image_id = fs.put(image.read(), filename=filename, content_type=image.content_type)
+                        updated_image_ids.append(str(original_image_id))
+                        
+                        # Reset the file pointer and read image again for thumbnail
+                        image.seek(0)
+                        img = Image.open(image)
+                        
+                        # Define thumbnail size (e.g., 200x150 pixels)
+                        img.thumbnail((200, 150))
+                        
+                        # Save thumbnail to a bytes buffer
+                        thumb_io = io.BytesIO()
+                        img.save(thumb_io, format=img.format)
+                        thumb_io.seek(0)
+                        
+                        # Save thumbnail image to GridFS
+                        thumbnail_image_id = fs.put(thumb_io.read(), filename=f"thumb_{filename}", content_type=image.content_type)
+                        updated_thumbnail_ids.append(str(thumbnail_image_id))
                     elif image and image.filename:
                         # Image has a filename but invalid type
                         logging.warning(f"Invalid file type for image during edit: {image.filename}")
@@ -398,7 +464,8 @@ def edit_vehicle(id):
                 "Model No": request.form.get('Model No', '').strip(),
                 "Status": request.form.get('Status', '').strip(),
                 "Location": request.form.get('Location', '').strip(),
-                "image_ids": updated_image_ids  # Set to the updated list
+                "image_ids": updated_image_ids,  # Set to the updated list
+                "thumbnail_ids": updated_thumbnail_ids  # Set to the updated thumbnail list
             }
 
             # Update the vehicle in MongoDB
@@ -421,15 +488,26 @@ def edit_vehicle(id):
         vehicle['_id'] = str(vehicle['_id'])  # Ensure ID is string
         return render_template('editvehicle.html', vehicle=vehicle, error_message=error_message), 500
 
-
 @app.route('/delete/<id>', methods=['POST'])
 def delete_vehicle(id):
     try:
-        # First, fetch the vehicle document to get associated image_ids
+        # First, fetch the vehicle document to get associated image_ids and thumbnail_ids
         vehicle = collection.find_one({"_id": ObjectId(id)})
         if not vehicle:
             logging.warning(f"Vehicle not found for deletion with ID: {id}")
             return jsonify({"success": False, "message": "Vehicle not found."}), 404
+
+        # Delete associated thumbnails from GridFS
+        if 'thumbnail_ids' in vehicle:
+            for thumb_id in vehicle['thumbnail_ids']:
+                try:
+                    fs.delete(ObjectId(thumb_id))
+                    logging.info(f"Deleted thumbnail {thumb_id} associated with vehicle {id}.")
+                except gridfs.NoFile:
+                    logging.warning(f"Thumbnail {thumb_id} not found in GridFS.")
+                except Exception as e:
+                    logging.error(f"Error deleting thumbnail {thumb_id}: {e}")
+                    return jsonify({"success": False, "message": "Error deleting thumbnails."}), 500
 
         # Delete associated images from GridFS
         if 'image_ids' in vehicle:
@@ -453,13 +531,11 @@ def delete_vehicle(id):
             return jsonify({"success": False, "message": "Vehicle not found."}), 404
     except Exception as e:
         logging.error(f"Error deleting vehicle: {e}")
-        return jsonify({"success": False, "message": "Error deleting vehicle."}), 500    
-
+        return jsonify({"success": False, "message": "Error deleting vehicle."}), 500
 
 @app.route('/form')
 def index():
     return render_template('form.html')  # Renders the HTML form
-
 
 if __name__ == '__main__':
     app.run(debug=True)  # Consider setting debug=False in production

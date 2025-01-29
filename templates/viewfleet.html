@@ -136,6 +136,12 @@
       height: 75px;
       object-fit: cover;
       border-radius: 5px;
+      cursor: pointer; /* Indicate that the image is clickable */
+      transition: transform 0.2s; /* Smooth hover effect */
+    }
+
+    .vehicle-image:hover {
+      transform: scale(1.05);
     }
 
     /* ============ PAGINATION STYLING ============ */
@@ -355,14 +361,26 @@
               <td class="sticky-column">{{ ((pagination.current_page - 1) * 10) + loop.index }}</td>
               <!-- Image Cell -->
               <td>
-                {% if vehicle.get('image_ids') and vehicle['image_ids']|length > 0 %}
-                  <!-- Display the first image -->
-                  <img 
-                    src="{{ url_for('get_image', image_id=vehicle['image_ids'][0]) }}" 
-                    alt="Vehicle Image" 
-                    class="vehicle-image"
-                    loading="lazy"
-                  >
+                {% if vehicle.get('thumbnail_ids') and vehicle['thumbnail_ids']|length > 0 %}
+                  <!-- Display the first thumbnail image with a link to the full-sized image -->
+                  <a href="{{ url_for('get_image', image_id=vehicle['image_ids'][0]) }}" target="_blank">
+                    <img 
+                      src="{{ url_for('get_thumbnail', image_id=vehicle['thumbnail_ids'][0]) }}" 
+                      alt="Vehicle Thumbnail" 
+                      class="vehicle-image"
+                      loading="lazy"
+                    >
+                  </a>
+                {% elif vehicle.get('image_ids') and vehicle['image_ids']|length > 0 %}
+                  <!-- Fallback: Display original image if thumbnail is not available -->
+                  <a href="{{ url_for('get_image', image_id=vehicle['image_ids'][0]) }}" target="_blank">
+                    <img 
+                      src="{{ url_for('get_image', image_id=vehicle['image_ids'][0]) }}" 
+                      alt="Vehicle Image" 
+                      class="vehicle-image"
+                      loading="lazy"
+                    >
+                  </a>
                 {% else %}
                   <!-- Placeholder Image -->
                   <img 
