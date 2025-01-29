@@ -87,23 +87,17 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def view_fleet():
     try:
-        if request.method == 'POST':
-            form_data = request.form
-            # For POST requests, reset to the first page
-            page = 1
-        else:
-            form_data = request.args  # To handle GET requests if needed
-            # Get the current page from query parameters, default to 1
-            page = int(request.args.get('page', 1))
+        form_data = request.args  # All filter parameters are in query args
+        page = int(request.args.get('page', 1))
         
         # Number of records per page
         PER_PAGE = 10
         
         # Build the query based on form data
-        query = build_query(form_data if request.method == 'POST' else {})
+        query = build_query(form_data)
         
         # Count total matching documents
         total_documents = collection.count_documents(query)
@@ -140,6 +134,7 @@ def view_fleet():
     except Exception as e:
         logging.error(f"Error fetching data: {e}")
         return jsonify({"success": False, "message": "Error fetching data."}), 500
+
 
 
 @app.route('/upload', methods=['POST'])

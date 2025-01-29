@@ -187,7 +187,7 @@
     
     <!-- Search Form -->
     <div class="mb-4">
-      <form method="POST">
+      <form method="GET">
         <div class="row g-3">
           <!-- Search Bar -->
           <div class="col-12 col-md-6">
@@ -329,7 +329,7 @@
         <thead>
           <tr>
             <th class="sticky-column">No.</th>
-            <!-- Added Image Column Header -->
+            <!-- Image Column Header -->
             <th>Image</th>
             <!-- End of Image Column Header -->
             <th>Registration No</th>
@@ -352,7 +352,7 @@
           {% for vehicle in vehicles %}
             <tr>
               <td class="sticky-column">{{ ((pagination.current_page - 1) * 10) + loop.index }}</td>
-              <!-- Added Image Cell -->
+              <!-- Image Cell -->
               <td>
                 {% if vehicle.get('image_ids') and vehicle['image_ids']|length > 0 %}
                   <!-- Display the first image -->
@@ -360,6 +360,7 @@
                     src="{{ url_for('get_image', image_id=vehicle['image_ids'][0]) }}" 
                     alt="Vehicle Image" 
                     class="vehicle-image"
+                    loading="lazy"  <!-- Added Lazy Loading -->
                   >
                 {% else %}
                   <!-- Placeholder Image -->
@@ -487,6 +488,7 @@
       </nav>
     {% endif %}
 
+    <!-- Export Button -->
     <div class="text-center mt-4">
       <a 
         href="{{ url_for('export_fleet', 
