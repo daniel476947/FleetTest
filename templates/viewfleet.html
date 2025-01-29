@@ -310,9 +310,10 @@
             </select>
           </div>
 
-          <!-- Apply Button -->
+          <!-- Apply and Reset Buttons -->
           <div class="col-12 text-center">
-            <button type="submit" class="btn btn-primary">Search</button>
+            <button type="submit" class="btn btn-primary me-2">Search</button>
+            <a href="{{ url_for('view_fleet') }}" class="btn btn-secondary">Reset</a>
           </div>
         </div>
       </form>
@@ -360,7 +361,7 @@
                     src="{{ url_for('get_image', image_id=vehicle['image_ids'][0]) }}" 
                     alt="Vehicle Image" 
                     class="vehicle-image"
-                    loading="lazy" 
+                    loading="lazy"
                   >
                 {% else %}
                   <!-- Placeholder Image -->
