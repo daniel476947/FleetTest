@@ -98,8 +98,6 @@
     }
 
     /* ============ STICKY COLUMN STYLING ============ */
-
-    /* Existing sticky column styles */
     .sticky-column {
         position: sticky;
         left: 0;
@@ -109,19 +107,14 @@
         border-right: 1px solid #ddd; /* Right border for separation */
         box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.1); /* Optional shadow */
     }
-
-    /* Header cell styling */
     thead th.sticky-column {
         background-color: #f4f4f4; /* Match your header background */
         z-index: 11; /* Higher than body cells */
         border-right: 1px solid #ddd; /* Right border for consistency */
     }
-
-    /* Alternating background colors for body cells in the sticky column */
     tbody tr:nth-child(odd) td.sticky-column {
         background-color: #ffffff; /* White for odd rows */
     }
-
     tbody tr:nth-child(even) td.sticky-column {
         background-color: #f9f9f9; /* Light grey for even rows */
     }
@@ -139,7 +132,6 @@
       cursor: pointer; /* Indicate that the image is clickable */
       transition: transform 0.2s; /* Smooth hover effect */
     }
-
     .vehicle-image:hover {
       transform: scale(1.05);
     }
@@ -147,6 +139,24 @@
     /* ============ PAGINATION STYLING ============ */
     .pagination {
       justify-content: center;
+    }
+
+    /* ============ STACK PAGINATION ON MOBILE ============ */
+    @media (max-width: 576px) {
+      /* Make pagination items stack vertically */
+      .pagination {
+        flex-direction: column;  /* Stack in a column */
+        align-items: center;     /* Center each button horizontally */
+      }
+      /* Ensure each page item sits nicely with spacing */
+      .pagination .page-item {
+        margin-bottom: 5px;
+        width: 100%; /* Optional: make them all stretch 100% wide */
+      }
+      .pagination .page-link {
+        width: 100%;  /* Full width for each link, or auto if you prefer minimal width */
+        text-align: center;
+      }
     }
   </style>
 </head>
