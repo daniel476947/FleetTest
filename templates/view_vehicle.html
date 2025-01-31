@@ -75,6 +75,7 @@
         width: 100%;
         height: 600px;       /* Fixed height to reserve space */
         object-fit: cover;   /* Crop image nicely within this area */
+        cursor: pointer;     /* Indicate it's clickable */
       }
 
       /* ===================== TABLE STYLES ===================== */
@@ -123,6 +124,14 @@
       /* ===================== LOGO SIZE DESKTOP ===================== */
       .navbar-brand img {
         height: 40px;
+      }
+
+      /* ===================== MODAL FULLSCREEN IMAGE ===================== */
+      .modal-fullscreen .modal-body img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;  /* Ensure full image is visible (no cropping) */
+        background-color: #000;
       }
     </style>
 </head>
@@ -173,6 +182,7 @@
         <div class="carousel-inner">
             {% for image_id in vehicle['image_ids'] %}
             <div class="carousel-item {% if loop.first %}active{% endif %}">
+              <!-- Clicking the image triggers the modal -->
               <img 
                 src="{{ url_for('get_image', image_id=image_id) }}" 
                 class="d-block carousel-image" 
@@ -180,6 +190,9 @@
                 loading="lazy"
                 width="1920"
                 height="600"
+                data-bs-toggle="modal"
+                data-bs-target="#fullscreenModal"
+                onclick="showFullImage('{{ url_for('get_image', image_id=image_id) }}')"
               >
             </div>
             {% endfor %}
@@ -297,6 +310,31 @@
 
   </div> <!-- end .container -->
 
+  <!-- ===================== FULLSCREEN MODAL ===================== -->
+  <div 
+    class="modal fade" 
+    id="fullscreenModal" 
+    tabindex="-1" 
+    aria-labelledby="fullscreenModalLabel" 
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content">
+        <!-- Close button (top-right) -->
+        <button 
+          type="button" 
+          class="btn-close position-absolute top-0 end-0 m-3" 
+          data-bs-dismiss="modal" 
+          aria-label="Close"
+        ></button>
+        <div class="modal-body p-0">
+          <!-- The image will fill this entire modal -->
+          <img id="modalFullImage" src="" alt="Full Image">
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- FOOTER -->
   <footer class="footer">
     <p>&copy; 2025 Knight Rider Transportation. All rights reserved.</p>
@@ -306,5 +344,13 @@
   <script 
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
   ></script>
+
+  <script>
+    // Replace modal image src when an image is clicked
+    function showFullImage(imageUrl) {
+      const modalImage = document.getElementById('modalFullImage');
+      modalImage.src = imageUrl;
+    }
+  </script>
 </body>
 </html>
