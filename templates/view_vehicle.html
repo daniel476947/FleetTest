@@ -136,12 +136,12 @@
           }
         }
 
-        /* ============ CAROUSEL IMAGE SIZING ============ */
-        .carousel-image {
-            width: 100%;
-            max-height: 500px;   /* Adjust as needed */
-            object-fit: cover;   /* Crop the image to fit nicely */
+          .carousel-image {
+          width: 100%;         /* Fill the carousel width */
+          height: 400px;       /* Fixed height (adjust as desired) */
+          object-fit: cover;   /* Crop the image nicely within this area */
         }
+
     </style>
 </head>
 <body>
@@ -191,14 +191,15 @@
         <div class="carousel-inner">
             {% for image_id in vehicle['image_ids'] %}
             <div class="carousel-item {% if loop.first %}active{% endif %}">
-                <!-- Using the original/detailed image route -->
-                <img 
-                  src="{{ url_for('get_image', image_id=image_id) }}" 
-                  class="d-block carousel-image" 
-                  alt="Vehicle Image {{ loop.index }}" 
-                  loading="lazy"
-                >
-            </div>
+              <img 
+                src="{{ url_for('get_image', image_id=image_id) }}" 
+                class="d-block carousel-image" 
+                alt="Vehicle Image {{ loop.index }}" 
+                loading="lazy"
+                width="1920"   <!-- Optional explicit width in px -->
+                height="400"   <!-- Optional explicit height in px -->
+              >
+          </div>
             {% endfor %}
         </div>
         <!-- Carousel Controls: Previous -->
