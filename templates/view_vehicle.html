@@ -70,17 +70,28 @@
         margin: 0;
       }
 
-      /* ===================== CAROUSEL IMAGE RESPONSIVENESS ===================== */
-      .carousel-image {
-        width: 100%;          /* Fill carousel width on all devices */
-        max-height: 600px;    /* Limit the height on larger screens */
-        object-fit: cover;    /* Crop image to fill area */
+      /* ===================== CAROUSEL IMAGE RESPONSIVENESS + ASPECT RATIO ===================== */
+      .carousel-inner {
+        /* No special height here; each .carousel-item will define its own height via aspect ratio */
       }
-      @media (max-width: 576px) {
-        .carousel-image {
-          max-height: 300px;  /* Shrink the max-height on mobile for better viewing */
-        }
+      .carousel-item {
+        /* Create a fixed aspect ratio container (16:9). 
+           Browser reserves the space BEFORE images load, so the table won't jump. */
+        position: relative;
+        width: 100%;
+        padding-bottom: 56.25%; /* 16:9 ratio => (9/16 * 100)% = 56.25% */
       }
+      .carousel-item img {
+        /* Fill the parent .carousel-item (absolute + top/left = 0) */
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%; 
+        object-fit: cover; 
+      }
+
+      /* Optional: For narrower screens, you could adjust ratio or let it be as is. */
 
       /* ===================== TABLE STYLES ===================== */
       table {
@@ -180,7 +191,6 @@
           <div class="carousel-item {% if loop.first %}active{% endif %}">
             <img 
               src="{{ url_for('get_image', image_id=image_id) }}" 
-              class="d-block carousel-image" 
               alt="Vehicle Image {{ loop.index }}"
               loading="lazy"
             >
