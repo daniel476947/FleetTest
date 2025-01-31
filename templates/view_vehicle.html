@@ -20,128 +20,110 @@
 
     <!-- Custom CSS Styles -->
     <style>
-        /* ============ NAVBAR & BODY PADDING ============ */
-        .navbar {
-          background-color: black;
-          padding-top: 15px;
-          padding-bottom: 15px;
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          z-index: 1000;
-        }
+      /* ===================== NAVBAR STYLES (MATCH EDIT PAGE) ===================== */
+      .navbar {
+        background-color: black;
+        padding-top: 15px;  /* Increase top padding */
+        padding-bottom: 15px;  /* Increase bottom padding */
+        position: fixed;  /* Fix the navbar to the top */
+        top: 0;  /* Set it to the top of the page */
+        left: 0;  /* Align to the left edge */
+        width: 100%;  /* Ensure it spans the full width of the page */
+        z-index: 1000;  /* Make sure the navbar stays on top of other content */
+      }
+      .navbar-toggler-icon {
+        filter: invert(1); /* Inverts the icon color for toggler */
+      }
+      .navbar-nav .nav-link {
+        color: white !important;
+      }
+      .navbar-nav .nav-link:hover {
+        color: #777684 !important;
+      }
+      .navbar-container {
+        padding-left: 30px; /* Adjust the left padding */
+        padding-right: 30px; /* Adjust the right padding */
+      }
 
-        .navbar-nav .nav-link {
-          color: white !important;
-        }
+      /* ===================== BODY & FOOTER (MATCH EDIT PAGE) ===================== */
+      body {
+        padding-top: 75px;  /* Prevent content from being hidden behind navbar */
+      }
+      .footer {
+        background-color: black;
+        color: white;
+        padding: 20px 0;
+        text-align: center;
+        position: relative;
+        bottom: 0;
+        width: 100%;
+        margin-top: 100px;  /* Add margin on top, matching edit page */
+      }
+      .footer a {
+        color: #f8f9fa;
+        text-decoration: none;
+      }
+      .footer a:hover {
+        text-decoration: underline;
+      }
+      .footer p {
+        margin: 0;
+      }
 
-        .navbar-nav .nav-link:hover {
-          color: #777684 !important;
-        }
+      /* ===================== CAROUSEL IMAGE SIZING ===================== */
+      .carousel-image {
+        width: 100%;
+        height: 600px;       /* Fixed height to reserve space */
+        object-fit: cover;   /* Crop image nicely within this area */
+      }
 
-        .navbar-container {
-          padding-left: 30px;
-          padding-right: 30px;
-        }
+      /* ===================== TABLE STYLES ===================== */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+      }
+      th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+      }
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      .table-container {
+        margin-top: 30px;
+        overflow-x: auto;
+      }
 
-        /* Add padding to the body to prevent content from being hidden behind the navbar */
-        body {
-          padding-top: 75px; /* Adjust this based on your navbar height */
-          display: flex;
-          flex-direction: column;
-          min-height: 100vh;
-        }
-
-        /* ============ MAIN CONTENT STYLING ============ */
-        .main-content {
-          flex: 1;
-        }
-
-        /* ============ TABLE STYLING ============ */
-        table {
-          width: 100%;
-          border-collapse: collapse;
+      /* ===================== CARD HEADER (RESPONSIVE) ===================== */
+      .card-header h4 {
+        font-size: 1.5rem;
+      }
+      @media (max-width: 576px) {
+        .card-header h4 {
+          font-size: 1.2rem;
         }
         th, td {
-          border: 1px solid #ddd;
-          padding: 12px;
-          text-align: left;
+          font-size: 0.9rem;
+          padding: 8px;
         }
-        th {
-          background-color: #f4f4f4;
-          font-weight: bold;
+        .btn {
+          font-size: 0.8rem;
+          padding: 0.3rem 0.5rem;
         }
-        tr:nth-child(even) {
-          background-color: #f9f9f9;
-        }
-        .table-container {
-          margin-top: 30px;
-          overflow-x: auto;
-        }
-
-        /* ============ FOOTER STYLES ============ */
-        .footer {
-          background-color: black;
-          color: white;
-          padding: 20px 0;
-          text-align: center;
-          width: 100%;
-          flex-shrink: 0; /* Prevent footer from shrinking */
-        }
-
-        .footer a {
-          color: #f8f9fa;
-          text-decoration: none;
-        }
-
-        .footer a:hover {
-          text-decoration: underline;
-        }
-
-        .footer p {
-          margin: 0;
-        }
-
-        /* ============ RESPONSIVE CARD STYLING ============ */
-        .card-header h4 {
-          font-size: 1.5rem;
-        }
-
-        @media (max-width: 576px) {
-          .card-header h4 {
-            font-size: 1.2rem;
-          }
-          th, td {
-            font-size: 0.9rem;
-            padding: 8px;
-          }
-          .btn {
-            font-size: 0.8rem;
-            padding: 0.3rem 0.5rem;
-          }
-          .navbar-brand img {
-            height: 30px;
-          }
-        }
-
-        /* ============ LOGO RESPONSIVENESS ============ */
         .navbar-brand img {
-          height: 40px;
+          height: 30px;
         }
+      }
 
-        @media (max-width: 576px) {
-          .navbar-brand img {
-            height: 30px;
-          }
-        }
-
-          .carousel-image {
-          width: 100%;         /* Fill the carousel width */
-          height: 400px;       /* Fixed height (adjust as desired) */
-          object-fit: cover;   /* Crop the image nicely within this area */
-        }
-
+      /* ===================== LOGO SIZE DESKTOP ===================== */
+      .navbar-brand img {
+        height: 40px;
+      }
     </style>
 </head>
 <body>
@@ -182,10 +164,10 @@
   </nav>
 
   <!-- MAIN CONTENT -->
-  <div class="container my-5 main-content">
+  <div class="container my-5">
     <h1 class="text-center mb-4">Vehicle Details</h1>
 
-    <!-- ================== START: IMAGE CAROUSEL SECTION ================== -->
+    <!-- ================== IMAGE CAROUSEL SECTION ================== -->
     {% if vehicle.get('image_ids') and vehicle['image_ids']|length > 0 %}
       <div id="vehicleImageCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
         <div class="carousel-inner">
@@ -196,10 +178,10 @@
                 class="d-block carousel-image" 
                 alt="Vehicle Image {{ loop.index }}" 
                 loading="lazy"
-                width="1920"   <!-- Optional explicit width in px -->
-                height="400"   <!-- Optional explicit height in px -->
+                width="1920"
+                height="600"
               >
-          </div>
+            </div>
             {% endfor %}
         </div>
         <!-- Carousel Controls: Previous -->
@@ -226,99 +208,99 @@
     {% else %}
       <p class="text-muted">No images available for this vehicle.</p>
     {% endif %}
-    <!-- ================== END: IMAGE CAROUSEL SECTION ================== -->
 
     <div class="card">
-        <div class="card-header bg-primary text-white">
-            <!-- If there's no Registration No, display 'Unregistered' -->
-            <h4>{{ vehicle['Registration No'] or 'Unregistered' }}</h4>
+      <div class="card-header bg-primary text-white">
+        <!-- If there's no Registration No, display 'Unregistered' -->
+        <h4>{{ vehicle['Registration No'] or 'Unregistered' }}</h4>
+      </div>
+      <div class="card-body">
+        <!-- Responsive Table -->
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <tbody>
+              <tr>
+                <th scope="row">Make</th>
+                <td>{{ vehicle['Make'] }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Model</th>
+                <td>{{ vehicle['Model'] }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Vehicle Type</th>
+                <td>{{ vehicle['Vehicle Type'] }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Year</th>
+                <td>{{ vehicle['Year'] }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Main Colour</th>
+                <td>{{ vehicle['Main Colour'] }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Secondary Colour</th>
+                <td>{{ vehicle['Secondary Colour'] or 'N/A' }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Fuel</th>
+                <td>{{ vehicle['Fuel'] }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Capacity</th>
+                <td>{{ vehicle['Capacity'] }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Chassis No</th>
+                <td>{{ vehicle['Chassis No'] }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Model No</th>
+                <td>{{ vehicle['Model No'] }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Status</th>
+                <td>{{ vehicle['Status'] }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Location</th>
+                <td>{{ vehicle['Location'] }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div class="card-body">
-            <!-- Responsive Table -->
-            <div class="table-responsive">
-                <table class="table table-bordered">
-                    <tbody>
-                        <tr>
-                            <th scope="row">Make</th>
-                            <td>{{ vehicle['Make'] }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Model</th>
-                            <td>{{ vehicle['Model'] }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Vehicle Type</th>
-                            <td>{{ vehicle['Vehicle Type'] }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Year</th>
-                            <td>{{ vehicle['Year'] }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Main Colour</th>
-                            <td>{{ vehicle['Main Colour'] }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Secondary Colour</th>
-                            <td>{{ vehicle['Secondary Colour'] or 'N/A' }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Fuel</th>
-                            <td>{{ vehicle['Fuel'] }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Capacity</th>
-                            <td>{{ vehicle['Capacity'] }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Chassis No</th>
-                            <td>{{ vehicle['Chassis No'] }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Model No</th>
-                            <td>{{ vehicle['Model No'] }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Status</th>
-                            <td>{{ vehicle['Status'] }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Location</th>
-                            <td>{{ vehicle['Location'] }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <!-- Action Buttons -->
-            <div class="mt-4 d-flex flex-wrap gap-2">
-                <a href="{{ url_for('view_fleet') }}" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> Back to Fleet
-                </a>
-                <a href="{{ url_for('edit_vehicle', id=vehicle['_id']) }}" class="btn btn-primary">
-                    <i class="bi bi-pencil-square"></i> Edit
-                </a>
-                <form 
-                  action="{{ url_for('delete_vehicle', id=vehicle['_id']) }}" 
-                  method="POST" 
-                  style="display:inline;"
-                >
-                    <button 
-                      type="submit" 
-                      class="btn btn-danger" 
-                      onclick="return confirm('Are you sure you want to delete this vehicle?');"
-                    >
-                        <i class="bi bi-trash"></i> Delete
-                    </button>
-                </form>
-            </div>
+        <!-- Action Buttons -->
+        <div class="mt-4 d-flex flex-wrap gap-2">
+          <a href="{{ url_for('view_fleet') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Fleet
+          </a>
+          <a href="{{ url_for('edit_vehicle', id=vehicle['_id']) }}" class="btn btn-primary">
+            <i class="bi bi-pencil-square"></i> Edit
+          </a>
+          <form 
+            action="{{ url_for('delete_vehicle', id=vehicle['_id']) }}" 
+            method="POST" 
+            style="display:inline;"
+          >
+            <button 
+              type="submit" 
+              class="btn btn-danger" 
+              onclick="return confirm('Are you sure you want to delete this vehicle?');"
+            >
+              <i class="bi bi-trash"></i> Delete
+            </button>
+          </form>
         </div>
+      </div>
     </div>
-  </div>
+
+  </div> <!-- end .container -->
 
   <!-- FOOTER -->
   <footer class="footer">
     <p>&copy; 2025 Knight Rider Transportation. All rights reserved.</p>
-  </footer> 
+  </footer>
 
   <!-- Bootstrap 5 JS and dependencies -->
   <script 
