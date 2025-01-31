@@ -139,30 +139,24 @@
     /* ============ PAGINATION STYLING ============ */
     .pagination {
       justify-content: center;
-      flex-wrap: nowrap; /* Default: no wrapping on larger screens */
+      flex-wrap: nowrap; /* Default no-wrap on larger screens */
+    }
+    /* Remove extra spacing so the buttons are "stuck" together */
+    .pagination .page-item {
+      margin: 0;  /* Override Bootstrap's default spacing */
+    }
+    .pagination .page-link {
+      border-radius: 0;  /* Eliminate rounded corners so they line up flush */
     }
 
     /*
-      ============ MULTI-ROW PAGINATION ON SMALL SCREENS ============
-      On smaller devices (below 576px), we'll wrap items and aim for 5 items per row.
-      This is done by:
-      1) Allowing flex-wrap: wrap
-      2) Setting a fixed width of ~20% for each item (minus margin).
-      3) The leftover items automatically move to the next line.
-    */
+     * ============ WRAP PAGINATION ON SMALL SCREENS ============
+     * Let the items flow onto multiple lines if there's not enough horizontal space.
+     * This ensures no horizontal scrolling. Items remain stuck together with no spacing.
+     */
     @media (max-width: 576px) {
       .pagination {
-        flex-wrap: wrap;     /* Let items wrap onto new lines */
-      }
-      .pagination .page-item {
-        /* 
-          Each page item gets ~20% width if we want exactly 5 items per row.
-          We'll subtract some margin from 100% to prevent line breaks from rounding.
-        */
-        flex: 0 0 calc(20% - 10px);
-        margin: 5px;
-        display: flex;       /* Center the button within */
-        justify-content: center;
+        flex-wrap: wrap; 
       }
     }
   </style>
