@@ -139,23 +139,30 @@
     /* ============ PAGINATION STYLING ============ */
     .pagination {
       justify-content: center;
+      flex-wrap: nowrap; /* Default: no wrapping on larger screens */
     }
 
-    /* ============ STACK PAGINATION ON MOBILE ============ */
+    /*
+      ============ MULTI-ROW PAGINATION ON SMALL SCREENS ============
+      On smaller devices (below 576px), we'll wrap items and aim for 5 items per row.
+      This is done by:
+      1) Allowing flex-wrap: wrap
+      2) Setting a fixed width of ~20% for each item (minus margin).
+      3) The leftover items automatically move to the next line.
+    */
     @media (max-width: 576px) {
-      /* Make pagination items stack vertically */
       .pagination {
-        flex-direction: column;  /* Stack in a column */
-        align-items: center;     /* Center each button horizontally */
+        flex-wrap: wrap;     /* Let items wrap onto new lines */
       }
-      /* Ensure each page item sits nicely with spacing */
       .pagination .page-item {
-        margin-bottom: 5px;
-        width: 100%; /* Optional: make them all stretch 100% wide */
-      }
-      .pagination .page-link {
-        width: 100%;  /* Full width for each link, or auto if you prefer minimal width */
-        text-align: center;
+        /* 
+          Each page item gets ~20% width if we want exactly 5 items per row.
+          We'll subtract some margin from 100% to prevent line breaks from rounding.
+        */
+        flex: 0 0 calc(20% - 10px);
+        margin: 5px;
+        display: flex;       /* Center the button within */
+        justify-content: center;
       }
     }
   </style>
